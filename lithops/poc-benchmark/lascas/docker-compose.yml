@@ -1,0 +1,46 @@
+version: '3.5'
+services:
+  cas:
+    #command: bash -c "cd /etc/cas; cas provision --owner-config /etc/cas/cas-default-owner-config.toml --skip-if-already-provisioned"
+    command: bash -c "cd /etc/cas; cas -c /etc/cas/cas.toml"
+    environment:
+      - SCONE_HEAP=1G 
+      - SCONE_LOG=DEBUG
+      - SCONE_MODE=HW
+      - SCONE_LAS_ADDR=172.17.0.1
+    privileged: true
+    working_dir: /etc/cas
+    image: registry.scontain.com/scone.cloud/cas
+    depends_on:
+      - las
+    devices:
+      - "/dev/sgx_enclave:/dev/sgx_enclave"
+      - "/dev/sgx_provision:/dev/sgx_provision"
+    ports:
+      - "8081:8081"
+      - "18765:18765"
+    volumes:
+      - ./cas_files-5.8.0:/etc/cas
+    networks:
+      - neardata-net
+
+######
+  las:
+    environment:
+      - SCONE_LOG=DEBUG
+      - SCONE_MODE=HW
+    image: registry.scontain.com/scone.cloud/las
+    devices:
+      - "/dev/sgx_enclave:/dev/sgx_enclave"
+      - "/dev/sgx_provision:/dev/sgx_provision"
+    ports:
+     - target: 18766
+       published: 18766
+       protocol: tcp
+       mode: host
+    networks:
+      - neardata-net
+
+networks:
+  neardata-net:
+
