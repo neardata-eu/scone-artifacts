@@ -1,0 +1,20 @@
+###
+# Commands inside Lithops client container
+
+###
+# Edit configuration at will
+# ATTENTION: this container is created with this file shared from host as a volume
+# .........: such that modifications inside will reflect outside
+vi /etc/lithops/config 
+
+###
+# Run benchmark
+# ATTENTION: logs are saved in $PWD directory: exe_bench_simpler.out or exe_bench_complete.out
+nohup /python/run.sh simpler &
+nohup /python/run.sh cimplete &
+
+###
+# Edit benchmark program at will
+# ATTENTION: this container is created with this file shared from host as a volume
+# .........: such that modifications inside will reflect outside
+vim /python/benchmark.py
