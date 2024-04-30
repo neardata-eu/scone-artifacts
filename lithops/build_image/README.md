@@ -6,6 +6,7 @@ You don't need to rebuild anything if it is not necessary. Just retrieve the ima
 - **SCONE Lithops**: `docker pull registry.scontain.com/amiguel/neardatapublic/lithops:alpine_python310-scone-lithops301`
 
 ## Versions
+- Linux <span style="color:red">Alpine 3.17</span>
 - SCONE <span style="color:red">5.8.0</span>
 - Python <span style="color:red">3.10</span>
 - Lithops <span style="color:red">3.0.1</span>
