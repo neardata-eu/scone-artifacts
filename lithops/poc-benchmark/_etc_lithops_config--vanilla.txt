@@ -1,0 +1,31 @@
+lithops: 
+#    backend: k8s
+#    storage: minio
+#    storage: redis
+    backend: localhost
+    storage: localhost
+    execution_timeout: 3600
+    #log_level: INFO
+    log_level: DEBUG
+
+localhost:
+    runtime: python3
+
+k8s:
+    runtime_memory    : 8192
+    docker_server    : registry.scontain.com
+    docker_user      : yourusername
+    docker_password  : %%KEY_TO_DOCKER_REPO%%
+    runtime          : registry.scontain.com/amiguel/neardatapublic/lithops:alpine_python310-vanilla-lithops301
+
+redis:
+    host: 172.20.0.1
+    port: 6379
+
+
+minio:
+    storage_bucket: mybucket6
+    endpoint: http://172.20.0.1:9000
+    access_key_id: scone     
+    secret_access_key: myscone123
+

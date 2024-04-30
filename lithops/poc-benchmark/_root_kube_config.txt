@@ -1,0 +1,19 @@
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: %%%CERTIFICATE_FROM_KUBERNETES_SERVER%%%
+    server: https://host.docker.internal:38625
+  name: k3d-k3s-default
+contexts:
+- context:
+    cluster: k3d-k3s-default
+    user: admin@k3d-k3s-default
+  name: k3d-k3s-default
+current-context: k3d-k3s-default
+kind: Config
+preferences: {}
+users:
+- name: admin@k3d-k3s-default
+  user:
+    client-certificate-data: %%%CERTIFICATE_TO_ACCESS_KUBERNETES_SERVER%%%
+    client-key-data: %%%KEY_TO_ACCESS_KUBERNETES_SERVER%%%
