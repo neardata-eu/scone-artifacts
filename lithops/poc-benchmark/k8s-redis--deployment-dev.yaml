@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      imagePullSecrets:
+      - name: sconeapps
+      containers:
+      - name: redis
+        image: registry.scontain.com/sconecuratedimages/apps:redis-6-alpine
+        env:
+        - name: SCONE_LOG
+          value: error
+        - name: SCONE_VERSION
+          value: "1"
+        resources:
+          limits:
+            sgx.intel.com/enclave: "1"

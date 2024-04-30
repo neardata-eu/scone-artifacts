@@ -1,0 +1,3 @@
+###
+# Port forward to Redis
+nohup kubectl port-forward --address 0.0.0.0 services/redis 6379:6379 &
