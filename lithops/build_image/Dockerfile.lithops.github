@@ -1,0 +1,29 @@
+FROM registry.scontain.com/amiguel/neardatapublic/lithops:alpine_python310-lithops301.2.scratch
+
+ENV PYTHONUNBUFFERED TRUE
+
+# Copy Lithops proxy and lib to the container image.
+ENV APP_HOME /lithops
+WORKDIR $APP_HOME
+
+COPY lithops_k8s.zip .
+RUN unzip lithops_k8s.zip && rm lithops_k8s.zip
+
+#######
+#
+# mig: substituting for compiled version instead of the online verification
+RUN cd /; rm -rf /lithops/lithops; cp -pRf /usr/lib/python3.10/site-packages/lithops /lithops/lithops
+
+
+#######
+#
+ENV SCONE_ALLOW_DLOPEN="2"
+ENV SCONE_FORK="1"
+ENV SCONE_SYSLIBS="1"
+
+ENV SCONE_HEAP="4G"
+ENV SCONE_LOG="ERROR"
+
+ENV SCONE_MODE=AUTO
+
+CMD python3

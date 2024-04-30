@@ -1,0 +1,68 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE AS base
+ARG LT_VERSION
+######
+#
+RUN apk update && apk add \
+        zip redis curl \
+        jq vim
+
+RUN pip install --upgrade setuptools six pip \
+    && pip install --no-cache-dir \
+        flask \
+        pika \
+        boto3 \
+        ibm-cloud-sdk-core \
+        ibm-cos-sdk \
+        redis \
+        gevent \
+        requests \
+        PyYAML \
+        kubernetes \
+        numpy \
+        cloudpickle \
+        ps-mem \
+        tblib \
+        psutil
+
+######
+#
+WORKDIR /python
+COPY files/k8s.py.patch     k8s.py.patch
+RUN if [ "$LT_VERSION" == "3.0.1" ]; then cd /; patch -p1 < /python/k8s.py.patch; else echo "..:INF:skip patch k8s.py"; fi
+RUN rm k8s.py.patch
+
+COPY files/k8s--config-${LT_VERSION}.py.patch     k8s--config.py.patch
+RUN cd /; patch -p1 < /python/k8s--config.py.patch
+RUN rm k8s--config.py.patch
+
+COPY files/invokers.py.patch     invokers.py.patch
+RUN if [ "$LT_VERSION" == "3.0.1" ]; then cd /; patch -p1 < /python/invokers.py.patch; else echo "..:INF:skip patch invokers.py"; fi
+RUN rm invokers.py.patch
+
+
+######
+#
+FROM scratch
+
+COPY --from=base /bin /bin
+COPY --from=base /dev /dev
+COPY --from=base /etc /etc
+COPY --from=base /home /home
+COPY --from=base /lib /lib
+COPY --from=base /media /media
+COPY --from=base /mnt /mnt
+COPY --from=base /opt /opt
+COPY --from=base /proc /proc
+COPY --from=base /python/*.py /python/
+COPY --from=base /python/arrow/arrow/python/pyarrow/ /usr/lib/python3.10/site-packages/pyarrow
+RUN mkdir /root
+COPY --from=base /run /run
+COPY --from=base /sbin /sbin
+COPY --from=base /srv /srv
+COPY --from=base /sys /sys
+COPY --from=base /tmp /tmp
+COPY --from=base /usr /usr
+COPY --from=base /var /var
+
+CMD python3

@@ -1,0 +1,68 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE AS base
+FROM registry.scontain.com/cicd/base/crosscompilers:latest AS crosscompiler
+
+COPY --from=base /usr/lib/libpython* /usr/lib/
+COPY --from=base /usr/lib/python3.10 /usr/lib/python3.10
+COPY --from=base /usr/bin/python3.10 /usr/bin/python3.10
+
+COPY --from=registry.scontain.com/amiguel/neardatapublic/sconelibs:fork /opt/scone/lib/libc.scone-x86_64.so.1  /opt/scone/lib/libc.scone-x86_64.so.1
+COPY --from=registry.scontain.com/amiguel/neardatapublic/sconelibs:fork /opt/scone/lib/ld-scone-x86_64.so.1    /opt/scone/lib/ld-scone-x86_64.so.1
+
+COPY files/identity.pem /scone/identity.pem
+
+ENV SCONE_HEAP="760M"
+ENV SCONE_ALLOW_DLOPEN="1"
+ENV SCONE_LOG=info
+
+RUN scone-signer sign --sconify  --key /scone/identity.pem --env /usr/bin/python3.10 \
+  && rm -f /usr/local/bin/scone-signer \
+  && rm -f /scone/identity.pem
+
+
+######
+#
+FROM scratch
+
+COPY --from=base /bin /bin
+COPY --from=base /dev /dev
+COPY --from=base /etc /etc
+COPY --from=base /home /home
+COPY --from=base /lib /lib
+COPY --from=base /media /media
+COPY --from=base /mnt /mnt
+COPY --from=base /opt /opt
+COPY --from=base /proc /proc
+COPY --from=base /python /python
+RUN mkdir /root
+COPY --from=base /run /run
+COPY --from=base /sbin /sbin
+COPY --from=base /srv /srv
+COPY --from=base /sys /sys
+COPY --from=base /tmp /tmp
+COPY --from=base /usr /usr
+COPY --from=base /var /var
+
+COPY --from=crosscompiler /usr/bin/python3.10 /usr/bin/python3.10
+COPY --from=crosscompiler /opt/scone/lib/libc.scone-x86_64.so.1  /opt/scone/lib/
+COPY --from=crosscompiler /opt/scone/lib/ld-scone-x86_64.so.1  /opt/scone/lib/
+
+ENV PYTHONUNBUFFERED TRUE
+
+ENV APP_HOME /lithops
+WORKDIR $APP_HOME
+
+
+ENV SCONE_ALLOW_DLOPEN="2"
+ENV SCONE_FORK="1"
+ENV SCONE_SYSLIBS="1"
+
+ENV SCONE_HEAP="4G"
+ENV SCONE_LOG="ERROR"
+
+RUN rm -f  /usr/bin/python3 \
+  && ln -s /usr/bin/python3.10 /usr/bin/python3
+
+ENV SCONE_MODE=AUTO
+
+CMD python3
