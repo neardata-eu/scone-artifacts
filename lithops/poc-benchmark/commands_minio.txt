@@ -1,0 +1,32 @@
+###
+# Commands inside minIO container
+
+###
+# Seting up a user
+mc alias set 'myminio' 'http://172.20.0.2:9000' 'scone' 'myscone123'
+echo 123 >scrap.txt
+mc mb myminio/mybucket
+mc cp scrap.txt myminio/mybucket
+mc ls myminio/mybucket
+ls /data/mybucket/
+ls /data/mybucket/
+mc ls myminio
+ls /data/
+
+###
+# Bucket mybucket6 is created by Lithops
+ls /data/mybucket6
+ls -l /data/mybucket6
+mc ls myminio
+mc ls myminio/mybucket6/
+mc ls myminio/mybucket6/lithops.jobs/
+mc ls myminio/mybucket6/lithops.runtimes/
+mc ls myminio/mybucket6/lithops.runtimes/k8s/
+
+###
+# Example of removing cache left by Lithops runtime version 3.2.0
+mc rm -r --force myminio/mybucket6/lithops.runtimes/k8s/3.2.0
+
+###
+# Example of removing cache left by Lithops jobs synchronization execution
+mc rm -r --force myminio/mybucket6/lithops.jobs/ 2>&1 |tail
