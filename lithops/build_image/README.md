@@ -24,14 +24,14 @@ There are 3 phases, with 4 Dockerfile artifacts that are necessary, wherein mult
 2. **Enriched image**
    * <u>Dockerfile.lithops.python3.10.2.scratch</u>
      * Other Linux programs and other Python modules are installed
-     * Image sized is reduced by using "_**`FROM scratch`**_"
+     * Image size is reduced by using "_**`FROM scratch`**_"
    ****
 
 3. **Signed image**
    * <u>Dockerfile.lithops.python3.10.3.sign</u>
      * Python interpreter `python3.10` is signed to use SCONE libraries instead of traditional GLIBC
      * You have to provide a file [./files/identity.pem](./files/identity.pem "not available in the repository"). Check how to create one [here](https://sconedocs.github.io/ee_sconify_image/#identity)
-     * Image sized is reduced by using "_**`FROM scratch`**_"
+     * Image size is reduced by using "_**`FROM scratch`**_"
    ****
 
 4. **Lithops final injection**
