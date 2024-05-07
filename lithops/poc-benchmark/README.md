@@ -89,6 +89,6 @@ Test the user:
 <br>
 `ls -l /data/mybucket/`
 
-You may want to remove the administrator-level alias from list before executing the commands above: `mc alias remove myminio`; and also remove the user-level alias `mc alias remove sconeminio`
+You may want to remove the administrator-level alias from list before executing the commands above: `mc alias remove myminio`; and also remove the user-level alias after: `mc alias remove sconeminio`
 
 Naturally, the **`ls`** commands are not necessary, but a simple way to show that the cloud storage server persisted the files in disk
