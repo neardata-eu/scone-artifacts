@@ -1,7 +1,9 @@
 version: '3.5'
 services:
   cas:
+    # 1) CAS initialization
     #command: bash -c "cd /etc/cas; cas provision --owner-config /etc/cas/cas-default-owner-config.toml --skip-if-already-provisioned"
+    # 2) CAS operational
     command: bash -c "cd /etc/cas; cas -c /etc/cas/cas.toml"
     environment:
       - SCONE_HEAP=1G 

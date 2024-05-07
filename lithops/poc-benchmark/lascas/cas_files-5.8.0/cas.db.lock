@@ -1,4 +1,0 @@
-This file was automatically created by CAS.
-It ensures that only a single CAS instance can access the CAS database at a time.
-Please do not delete this file.
-The presence of this file is no indication that CAS is currently running.
