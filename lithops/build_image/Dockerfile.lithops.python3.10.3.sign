@@ -29,6 +29,7 @@ COPY --from=base /dev /dev
 COPY --from=base /etc /etc
 COPY --from=base /home /home
 COPY --from=base /lib /lib
+COPY --from=base /lithops /lithops
 COPY --from=base /media /media
 COPY --from=base /mnt /mnt
 COPY --from=base /opt /opt

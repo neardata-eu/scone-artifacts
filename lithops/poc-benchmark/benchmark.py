@@ -1,5 +1,7 @@
 import os
 
+import requests
+
 ###
 # LT
 from lithops import FunctionExecutor
@@ -18,6 +20,16 @@ import random
 from lithops import multiprocessing as mp
 from lithops.utils import setup_lithops_logger
 import logging
+
+#
+def hello(name):
+    return 'Hello {}!'.format(name)
+
+def hello(name, phrase):
+     return 'Hello {}! {}'.format(name, phrase)
+
+def double(i):
+    return i * 2
 
 # 
 def mult(x, y):
