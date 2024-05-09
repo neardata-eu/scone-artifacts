@@ -92,3 +92,55 @@ Test the user:
 You may want to remove the administrator-level alias from list before executing the commands above: `mc alias remove myminio`; and also remove the user-level alias after: `mc alias remove sconeminio`
 
 Naturally, the **`ls`** commands are not necessary, but a simple way to show that the cloud storage server persisted the files in disk
+
+---
+
+### Lithops
+
+#### Prepare configuration
+
+Lithops will be executed in two Docker Images: _Vanilla_, with regular Python, and _SCONE_, with "sconified" Python
+
+Some configuration files are injected into the containers started, with some of them shared between them
+
+- ./_etc_lithops_config--vanilla.txt # Lithops configuration, Vanilla.
+- ./_etc_lithops_config--scone.txt # Lithops configuration, SCONE
+
+> Edit accordingly both files above:
+>	+ **`lithops: backend:`** and **`lithops: storage:`**
+>	+ **`k8s: docker_user:`** and **`k8s: docker_password:`**
+
+- ./_root_kube_config.txt # Kubernetes client configuration, Shared
+> Get a copy from your home directory <u>$HOME/.kube/config</u> and save it here with the name above, or edit here accordingly:
+> - **`clusters: cluster: certificate-authority-data:`**
+> - **`users: user: client-certificate-data:`** and **`users: user: client-key-data:`**
+
+- ./benchmark.py # Python program, Shared
+- ./run.sh # Benchmark execution script, Shared
+- ./env.sh # Environment variables for Python program, Shared
+
+It is not necessary to change the remaining files, unless you want or need
+
+#### Load Lithops clients
+
+**Vanilla**. Execute the shell script: `./docker_run_vanilla_lithops.sh`. Container created <u>_lithopsclientalpinevan_</u>
+
+**SCONE**. Execute the shell script: `./docker_run_scone_lithops.sh`. Container created <u>_lithopsclientalpinesco_</u>
+
+Both scripts have environment variables that are passed as parameters to the `docker run` command
+
+#### Access the terminal
+
+**Vanilla**. Enter `docker exec -i -t lithopsclientalpinevan bash`
+
+**SCONE**. Enter `docker exec -i -t lithopsclientalpinesco bash`
+
+There are 2 sets of benchmarks: _simpler_ (hello, multiprocessing, storage os and storage cloud) and _complete_ (simpler, plus many others)
+
+Run **`nohup /python/run.sh simpler &`**
+<br>
+It will save a log file: _exe_bench_simpler.out_
+
+Run **`nohup /python/run.sh complete &`**
+<br>
+It will save a log file: _exe_bench_complete.out_
