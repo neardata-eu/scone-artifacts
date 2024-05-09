@@ -2,8 +2,8 @@
 _**READ THIS README BEFORE EXECUTING ANYTHING**_
 
 You don't need to rebuild anything if it is not necessary. Just retrieve the images:
-- **Vanilla Lithops**: `docker pull registry.scontain.com/amiguel/neardatapublic/lithops:alpine_python310-vanilla-lithops301`
-- **SCONE Lithops**: `docker pull registry.scontain.com/amiguel/neardatapublic/lithops:alpine_python310-scone-lithops301`
+- **Vanilla Lithops**: `docker pull registry.scontain.com/amiguel/neardatapublic/lithops:vanilla`
+- **SCONE Lithops**: `docker pull registry.scontain.com/amiguel/neardatapublic/lithops:latest`
 
 ## Versions
 - Linux <span style="color:red">Alpine 3.17</span>
