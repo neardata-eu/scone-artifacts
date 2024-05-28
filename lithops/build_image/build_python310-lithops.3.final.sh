@@ -15,23 +15,23 @@ LT_VERSION="${LT_VERSION:=3.0.1}"
 #test `docker builder ls |grep -E -v -e default -e ^NAME |wc -l` -gt 0 && docker builder prune -a -f 2>&1 |cat -n |tail || true
 
 ###
+# Enforce Lithops version in this image
+#pip uninstall --yes lithops || true
+#pip install --upgrade lithops==$LT_VERSION
+
+lithops runtime build -b k8s -f Dockerfile.lithops.github ${BASE_IMAGE}.int
+#docker tag $MADE_IMAGE ${MADE_IMAGE}.lt-${LT_VERSION}
+#docker push ${MADE_IMAGE}.lt-${LT_VERSION} 2>&1 |tail -5
+
+###
 # Build SCONE signed image
-docker build --no-cache --progress plain --build-arg BASE_IMAGE=$BASE_IMAGE -f $DOCKERFILE -t $MADE_IMAGE .
+docker build --no-cache --progress plain --build-arg BASE_IMAGE=${BASE_IMAGE}.int --build-arg LT_VERSION=$LT_VERSION -f $DOCKERFILE -t $MADE_IMAGE .
 docker push $MADE_IMAGE 2>&1 |tail -5
 
 ###
 # Save a copy before Lithops final installation step
 docker tag $MADE_IMAGE ${MADE_IMAGE}.sign
 docker push ${MADE_IMAGE}.sign 2>&1 |tail -5
-
-###
-# Enforce Lithops version in this image
-pip uninstall --yes lithops || true
-pip install --upgrade lithops==$LT_VERSION
-
-lithops runtime build -b k8s -f Dockerfile.lithops.github $MADE_IMAGE
-#docker tag $MADE_IMAGE ${MADE_IMAGE}.lt-${LT_VERSION}
-#docker push ${MADE_IMAGE}.lt-${LT_VERSION} 2>&1 |tail -5
 
 
 docker tag $BASE_IMAGE ${VNLA_IMAGE}

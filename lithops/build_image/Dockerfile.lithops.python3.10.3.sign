@@ -44,6 +44,20 @@ COPY --from=base /tmp /tmp
 COPY --from=base /usr /usr
 COPY --from=base /var /var
 
+###
+# TODO: delete this, after integrating changes into patch Phase 2 scrap
+ARG LT_VERSION
+COPY files/k8s--config-${LT_VERSION}.py.change /usr/lib/python3.10/site-packages/lithops/serverless/backends/k8s/config.py
+COPY files/k8s--config-${LT_VERSION}.py.change /lithops/lithops/serverless/backends/k8s/config.py
+
+COPY files/k8s.py.change /usr/lib/python3.10/site-packages/lithops/serverless/backends/k8s/k8s.py
+COPY files/k8s.py.change /lithops/lithops/serverless/backends/k8s/k8s.py
+
+COPY files/entry_point.py.change /usr/lib/python3.10/site-packages/lithops/serverless/backends/k8s/entry_point.py
+COPY files/entry_point.py.change /lithops/lithops/serverless/backends/k8s/entry_point.py
+COPY files/entry_point.py.change /lithops/lithopsentry.py
+
+
 COPY --from=crosscompiler /usr/bin/python3.10 /usr/bin/python3.10
 COPY --from=crosscompiler /opt/scone/lib/libc.scone-x86_64.so.1  /opt/scone/lib/
 COPY --from=crosscompiler /opt/scone/lib/ld-scone-x86_64.so.1  /opt/scone/lib/
