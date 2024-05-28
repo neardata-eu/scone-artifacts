@@ -1,0 +1,152 @@
+ARG BASE_IMAGE
+
+FROM registry.scontain.com/cicd/sconecli:latest AS binary-fs
+
+FROM $BASE_IMAGE AS base
+
+
+RUN apk upgrade && apk update
+RUN apk add less curl wget git vim make perl file 2>&1 >/dev/null
+
+RUN mkdir -p /go/bin
+RUN export PATH=$PATH:/usr/local/go/bin:/go/bin
+RUN go version
+
+RUN git clone https://github.com/minio/minio.git
+
+RUN export CGO_ENABLED=0
+RUN export GOROOT=/usr/local/go
+RUN export GOPATH=/go
+
+WORKDIR minio
+
+RUN go build -buildmode=exe -o /usr/bin/minio
+RUN file /usr/bin/minio
+RUN ls -l /usr/bin/minio
+
+COPY --from=minio/minio:latest /usr/bin/docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
+COPY --from=minio/minio:latest /usr/bin/mc /usr/bin/mc
+RUN /bin/mkdir /data
+
+#####
+##
+## preparation of file shield
+RUN ls -l /proc/mounts
+
+RUN find /bin /etc /lib /sbin /usr /var -type f >>files.txt
+RUN echo /proc/mounts >>files.txt
+RUN echo /proc/self/mounts >>files.txt
+RUN echo /proc/7/mounts >>files.txt
+RUN echo /proc/8/mounts >>files.txt
+RUN echo /data >>files.txt
+RUN cat files.txt |while read f; do echo " -i '$f' \\"; done >files.txt.formatted
+
+RUN echo "SCONE_PRODUCTION=0 SCONE_NO_TIME_THREAD=1 SCONE_NO_FS_SHIELD=1 SCONE_MODE=auto /opt/scone/bin/rust-cli binary-fs / / -v --host-path=/etc/resolv.conf \\">>script
+RUN cat files.txt.formatted >>script
+RUN echo " --host-path=/etc/hosts">>script
+RUN chmod +x script
+RUN ./script
+
+
+RUN ls -l /binary_fs_blob.s
+RUN ls -l /binary_fs.blob
+RUN ls -l /libbinary_fs_template.a
+
+####
+#
+FROM registry.scontain.com/scone.cloud/crosscompilers:latest AS crosscompiler
+
+
+COPY --from=base /binary_fs_blob.s /.
+COPY --from=base /binary_fs.blob /.
+COPY --from=base /libbinary_fs_template.a /.
+
+RUN scone gcc ./binary_fs_blob.s ./libbinary_fs_template.a -shared -o /libbinary-fs.so
+
+##
+#####
+
+#####
+##
+FROM base AS base2
+
+COPY --from=crosscompiler /libbinary-fs.so /lib/libbinary-fs.so
+
+RUN cp /usr/bin/minio /usr/bin/minio.vanilla
+
+COPY files/identity.pem /opt/scone/identity.pem
+
+RUN scone-signer sign --sconify --key /opt/scone/identity.pem --env /usr/bin/minio \
+  && rm -f /usr/local/bin/scone-signer \
+  && rm -f /opt/scone/identity.pem
+
+RUN file /usr/bin/minio
+RUN ls -l /usr/bin/minio
+
+RUN SCONE_HASH=1 /usr/bin/minio
+
+######
+#
+#FROM scratch AS copied
+# TODO del line DEBUG
+#COPY --from=base2 /go/minio/files.txt* /
+#COPY --from=base2  /data /data
+
+#COPY --from=base2 /bin /bin
+#COPY --from=base2 /etc /etc
+#COPY --from=base2 /go /go
+#COPY --from=base2 /home /home
+#COPY --from=base2 /lib /lib
+#COPY --from=base2 /media /media
+#COPY --from=base2 /mnt /mnt
+#COPY --from=base2 /opt /opt
+#RUN mkdir /root
+##COPY --from=base /root /root
+#COPY --from=base2 /sbin /sbin
+#COPY --from=base2 /srv /srv
+#COPY --from=base2 /usr /usr
+#COPY --from=base2 /var /var
+
+
+#########
+#
+#FROM copied AS end
+
+ENV PATH                          /go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV MC_CONFIG_DIR                 /tmp/.mc
+ENV MINIO_ACCESS_KEY_FILE         access_key
+ENV MINIO_SECRET_KEY_FILE         secret_key
+ENV MINIO_ROOT_USER_FILE          access_key
+ENV MINIO_ROOT_PASSWORD_FILE      secret_key
+ENV MINIO_KMS_SECRET_KEY_FILE     kms_master_key
+ENV MINIO_UPDATE_MINISIGN_PUBKEY  RWTx5Zr1tiHQLwG9keckT0c45M3AGeHD6IvimQHpyRywVWGbP1aVSGav
+ENV MINIO_CONFIG_ENV_FILE         config.env
+ENV MINIO_ROOT_USER               minioroot
+ENV MINIO_ROOT_PASSWORD           sc0n35EC4e7
+
+
+WORKDIR /
+
+RUN cat <<EOF >> minio_server.sh
+#!/bin/bash
+
+date >>minio.log
+minio server /data --address ':9100' --console-address ':9101' 2>&1 |tee -a minio.log
+EOF
+
+RUN chmod +x minio_server.sh
+
+
+ENV SCONE_ALLOW_DLOPEN="2"
+ENV SCONE_SYSLIBS="1"
+
+ENV SCONE_HEAP="2G"
+ENV SCONE_LOG="ERROR"
+
+ENV SCONE_MODE=AUTO
+
+ENV _SCONE_EXTENSIONS_PATH="/lib/libbinary-fs.so"
+
+CMD minio
+
+ENTRYPOINT /usr/bin/docker-entrypoint.sh
