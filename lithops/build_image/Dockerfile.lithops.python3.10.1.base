@@ -73,7 +73,7 @@ RUN pip install --upgrade httplib2==0.12.1
 RUN pip install --upgrade kafka_python==1.4.4
 RUN pip install --upgrade lxml #==4.3.1
 RUN pip install --upgrade python-dateutil==2.7.5
-RUN pip install --upgrade pika==0.13.1
+RUN pip install --upgrade pika==1.3.2
 RUN pip install --upgrade flask==1.1.1
 RUN pip install --upgrade gevent #==1.4.0
 RUN pip install --upgrade ibm-cos-sdk==2.5.3
