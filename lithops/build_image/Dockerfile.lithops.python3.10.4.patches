@@ -1,0 +1,31 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE AS base
+
+ARG LT_VERSION
+
+###
+# Lithops modified source to support SCONE in Kubernetes
+
+COPY files/$LT_VERSION/k8s--config.py /usr/lib/python3.10/site-packages/lithops/serverless/backends/k8s/config.py
+COPY files/$LT_VERSION/k8s--config.py /lithops/lithops/serverless/backends/k8s/config.py
+
+COPY files/$LT_VERSION/k8s.py /usr/lib/python3.10/site-packages/lithops/serverless/backends/k8s/k8s.py
+COPY files/$LT_VERSION/k8s.py /lithops/lithops/serverless/backends/k8s/k8s.py
+
+COPY files/$LT_VERSION/entry_point.py /usr/lib/python3.10/site-packages/lithops/serverless/backends/k8s/entry_point.py
+COPY files/$LT_VERSION/entry_point.py /lithops/lithops/serverless/backends/k8s/entry_point.py
+COPY files/$LT_VERSION/entry_point.py /lithops/lithopsentry.py
+
+COPY files/$LT_VERSION/invokers.py /usr/lib/python3.10/site-packages/lithops/invokers.py
+COPY files/$LT_VERSION/invokers.py /lithops/lithops/invokers.py
+
+COPY files/$LT_VERSION/storage.py /usr/lib/python3.10/site-packages/lithops/storage/storage.py
+COPY files/$LT_VERSION/storage.py /lithops/lithops/storage/storage.py
+
+COPY files/$LT_VERSION/status.py /usr/lib/python3.10/site-packages/lithops/worker/status.py
+COPY files/$LT_VERSION/status.py /lithops/lithops/worker/status.py
+
+RUN sed -i -e 's/collections.Callable/collections.abc.Callable/' /usr/lib/python3.10/site-packages/pika/utils.py
+COPY files/$LT_VERSION/monitor.py /usr/lib/python3.10/site-packages/lithops/monitor.py
+COPY files/$LT_VERSION/monitor.py /lithops/lithops/monitor.py
+

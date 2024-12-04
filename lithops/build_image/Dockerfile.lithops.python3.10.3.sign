@@ -1,13 +1,13 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE AS base
-FROM registry.scontain.com/cicd/base/crosscompilers:latest AS crosscompiler
+FROM registry.scontain.com/scone.cloud/crosscompilers:5.9.0-rc.7 AS crosscompiler
 
 COPY --from=base /usr/lib/libpython* /usr/lib/
 COPY --from=base /usr/lib/python3.10 /usr/lib/python3.10
 COPY --from=base /usr/bin/python3.10 /usr/bin/python3.10
 
-COPY --from=registry.scontain.com/amiguel/neardatapublic/sconelibs:fork /opt/scone/lib/libc.scone-x86_64.so.1  /opt/scone/lib/libc.scone-x86_64.so.1
-COPY --from=registry.scontain.com/amiguel/neardatapublic/sconelibs:fork /opt/scone/lib/ld-scone-x86_64.so.1    /opt/scone/lib/ld-scone-x86_64.so.1
+COPY --from=registry.scontain.com/amiguel/neardatapublic/sconelibs:procfs /opt/scone/lib/libc.scone-x86_64.so.1  /opt/scone/lib/libc.scone-x86_64.so.1.procfs
+COPY --from=registry.scontain.com/amiguel/neardatapublic/sconelibs:procfs /opt/scone/lib/ld-scone-x86_64.so.1    /opt/scone/lib/ld-scone-x86_64.so.1.procfs
 
 COPY files/identity.pem /scone/identity.pem
 
@@ -15,7 +15,7 @@ ENV SCONE_HEAP="760M"
 ENV SCONE_ALLOW_DLOPEN="1"
 ENV SCONE_LOG=info
 
-RUN scone-signer sign --sconify  --key /scone/identity.pem --env /usr/bin/python3.10 \
+RUN scone-signer sign --sconify --mprotect=0  --key /scone/identity.pem --env /usr/bin/python3.10 \
   && rm -f /usr/local/bin/scone-signer \
   && rm -f /scone/identity.pem
 
@@ -44,23 +44,8 @@ COPY --from=base /tmp /tmp
 COPY --from=base /usr /usr
 COPY --from=base /var /var
 
-###
-# TODO: delete this, after integrating changes into patch Phase 2 scrap
-ARG LT_VERSION
-COPY files/k8s--config-${LT_VERSION}.py.change /usr/lib/python3.10/site-packages/lithops/serverless/backends/k8s/config.py
-COPY files/k8s--config-${LT_VERSION}.py.change /lithops/lithops/serverless/backends/k8s/config.py
-
-COPY files/k8s.py.change /usr/lib/python3.10/site-packages/lithops/serverless/backends/k8s/k8s.py
-COPY files/k8s.py.change /lithops/lithops/serverless/backends/k8s/k8s.py
-
-COPY files/entry_point.py.change /usr/lib/python3.10/site-packages/lithops/serverless/backends/k8s/entry_point.py
-COPY files/entry_point.py.change /lithops/lithops/serverless/backends/k8s/entry_point.py
-COPY files/entry_point.py.change /lithops/lithopsentry.py
-
-
 COPY --from=crosscompiler /usr/bin/python3.10 /usr/bin/python3.10
-COPY --from=crosscompiler /opt/scone/lib/libc.scone-x86_64.so.1  /opt/scone/lib/
-COPY --from=crosscompiler /opt/scone/lib/ld-scone-x86_64.so.1  /opt/scone/lib/
+COPY --from=crosscompiler /opt/scone  /opt/scone
 
 ENV PYTHONUNBUFFERED TRUE
 
@@ -77,6 +62,13 @@ ENV SCONE_LOG="ERROR"
 
 RUN rm -f  /usr/bin/python3 \
   && ln -s /usr/bin/python3.10 /usr/bin/python3
+
+RUN mv -vf /opt/scone/lib/libc.scone-x86_64.so.1  /opt/scone/lib/libc.scone-x86_64.so.1.590rc7
+RUN mv -vf /opt/scone/lib/ld-scone-x86_64.so.1    /opt/scone/lib/ld-scone-x86_64.so.1.590rc7
+RUN cp -pvf /opt/scone/lib/libc.scone-x86_64.so.1.procfs /opt/scone/lib/libc.scone-x86_64.so.1
+RUN cp -pvf /opt/scone/lib/ld-scone-x86_64.so.1.procfs   /opt/scone/lib/ld-scone-x86_64.so.1
+RUN ln -svf /opt/scone/lib/libc.scone-x86_64.so.1.procfs  /lib/libc.scone-x86_64.so.1
+RUN ln -svf /opt/scone/lib/ld-scone-x86_64.so.1.procfs    /lib/ld-scone-x86_64.so
 
 ENV SCONE_MODE=AUTO
 

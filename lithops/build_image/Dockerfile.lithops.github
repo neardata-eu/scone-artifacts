@@ -1,4 +1,4 @@
-FROM yourdockerrepo/lithops:alpine_python310-lithops301.2.scratch
+FROM yourdockerrepo/lithops:alpine_python310-lithops350.2.scratch
 
 ENV PYTHONUNBUFFERED TRUE
 

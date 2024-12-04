@@ -3,11 +3,11 @@
 set -e
 set -x
 
-BASE_IMAGE=yourdockerrepo/lithops:alpine_python310-lithops301.2.scratch
-MADE_IMAGE=yourdockerrepo/lithops:alpine_python310-scone-lithops301
-VNLA_IMAGE=yourdockerrepo/lithops:alpine_python310-vanilla-lithops301
+BASE_IMAGE=yourdockerrepo/lithops:alpine_python310-lithops350.2.scratch
+MADE_IMAGE=yourdockerrepo/lithops:alpine_python310-scone-lithops350
+VNLA_IMAGE=yourdockerrepo/lithops:alpine_python310-vanilla-lithops350
 DOCKERFILE=Dockerfile.lithops.python3.10.3.sign
-LT_VERSION="${LT_VERSION:=3.0.1}"
+LT_VERSION="${LT_VERSION:=3.5.0}"
 
 ###
 # if you want to clean Docker build cache, uncomment these 2 lines
@@ -16,6 +16,8 @@ LT_VERSION="${LT_VERSION:=3.0.1}"
 
 ###
 # Enforce Lithops version in this image
+# *** (in case at this stage you want to change it. Not necessary or recommended)
+# Lithops installation in the image requires the workstation to also have it installed, hence the 'pip' below
 #pip uninstall --yes lithops || true
 #pip install --upgrade lithops==$LT_VERSION
 

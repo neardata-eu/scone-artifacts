@@ -92,9 +92,10 @@ COPY files/hellolithops.py           hellolithops.py
 COPY files/multiprocessinglithops.py multiprocessinglithops.py
 COPY files/storagelithops.py         storagelithops.py
 COPY files/storageoslithops.py       storageoslithops.py
-COPY files/future.py.patch           future.py.patch
+#COPY files/future.py.patch           future.py.patch
+COPY files/$LT_VERSION/future.py.patch     future.py.patch
 COPY files/connection.py.patch       connection.py.patch
-RUN cd /; patch -p1 < /python/future.py.patch
+#RUN cd /; patch -p1 < /python/future.py.patch
 RUN cd /; patch -p1 < /python/connection.py.patch
 RUN rm future.py.patch connection.py.patch
 

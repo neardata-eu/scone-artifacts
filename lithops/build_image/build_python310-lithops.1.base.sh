@@ -3,9 +3,9 @@
 set -e
 set -x
 
-MADE_IMAGE=yourdockerrepo/lithops:alpine_python310-lithops301.1.base
+MADE_IMAGE=yourdockerrepo/lithops:alpine_python310-lithops350.1.base
 DOCKERFILE=Dockerfile.lithops.python3.10.1.base
-LT_VERSION="${LT_VERSION:=3.0.1}"
+LT_VERSION="${LT_VERSION:=3.5.0}"
 
 ###
 # if you want to clean Docker build cache, uncomment these 2 lines

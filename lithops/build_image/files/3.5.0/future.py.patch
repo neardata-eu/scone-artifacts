@@ -1,0 +1,51 @@
+--- /usr/lib/python3.10/site-packages/lithops/future.py	2024-11-06 18:37:49.664322394 +0100
++++ /usr/lib/python3.10/site-packages/lithops/future.py	2024-11-07 15:26:13.042226607 +0100
+@@ -191,16 +191,44 @@
+             if internal_storage is None:
+                 internal_storage = InternalStorage(self._storage_config)
+             check_storage_path(internal_storage.get_storage_config(), self._storage_path)
+-            self._call_status = internal_storage.get_call_status(self.executor_id, self.job_id, self.call_id)
++
++            # mig 06nov2024 - Patch by Sergey @ SCONTAIN
++            call_status = internal_storage.get_call_status(self.executor_id, self.job_id, self.call_id)
++            logger.warning(f'..:DBG:call_status[{call_status}] = internal_storage.get_call_status(self.executor_id[{self.executor_id}], self.job_id[{self.job_id}], self.call_id[{self.call_id}])')
+             self._status_query_count += 1
++            logger.warning(f'..:DBG:self._status_query_count[{self._status_query_count}] += 1')
++
++            # mig 06nov2024 - Patch by Sergey @ SCONTAIN
++            logger.warning(f"..:DBG:if call_status[{call_status}] is not None or (self._call_status[{self._call_status}] is None or self._call_status['type'][{self._call_status}] != '__init__'):")
++            if call_status is not None or (self._call_status is None or self._call_status['type'] != '__init__'):
++                self._call_status = call_status
++                logger.warning(f"..:DBG:entered if:self._call_status[{self._call_status}] = call_status")
++            logger.warning(f"..:DBG:outside if:self._call_status[{self._call_status}]")
+ 
++            logger.warning(f"..:DBG:if check_only[{check_only}]:")
+             if check_only:
+-                return self._call_status
++                # mig 06nov2024 - Patch by Sergey @ SCONTAIN
++                logger.warning(f"..:DBG:entered if:return call_status[{call_status}]")
++                return call_status
++            logger.warning(f"..:DBG:outside if:call_status[{call_status}]")
+ 
+-            while self._call_status is None:
++            # mig 06nov2024 - Patch by Sergey @ SCONTAIN
++            logger.warning(f"..:DBG:while call_status[{call_status}] is None:")
++            while call_status is None:
++                logger.warning(f"..:DBG:entered while:time.sleep([{wait_dur_sec}]")
+                 time.sleep(wait_dur_sec)
+-                self._call_status = internal_storage.get_call_status(self.executor_id, self.job_id, self.call_id)
++
++                # mig 06nov2024 - Patch by Sergey @ SCONTAIN
++                logger.warning(f"..:DBG:entered while:...")
++                call_status = internal_storage.get_call_status(self.executor_id, self.job_id, self.call_id)
++                logger.warning(f"..:DBG:entered while:call_status[{call_status}] = internal_storage.get_call_status(self.executor_id[{self.executor_id}], self.job_id[{self.job_id}], self.call_id[{self.call_id}])")
+                 self._status_query_count += 1
++                logger.warning(f'..:DBG:entered while:self._status_query_count[{self._status_query_count}] += 1')
++
++            # mig 12jul2023 - Patch by Sergey @ SCONTAIN
++            self._call_status = call_status
++            logger.warning(f'..:DBG:self._call_status[{self._call_status}] = call_status')
++
+             self._host_status_done_tstamp = time.time()
+ 
+         self.stats['host_status_done_tstamp'] = self._host_status_done_tstamp or time.time()
