@@ -3,8 +3,10 @@
 set -e
 set -x
 
-BASE_IMAGE=yourdockerrepo/lithops:alpine_python310-scone-lithops350
-MADE_IMAGE=yourdockerrepo/lithops:alpine_python310-scone-lithops350.1
+#BASE_IMAGE=yourdockerrepo/lithops:alpine_python310-scone-lithops350
+#MADE_IMAGE=yourdockerrepo/lithops:alpine_python310-scone-lithops350.1
+BASE_IMAGE=registry.scontain.com/amiguel/neardatapublic/lithops:git_alpine_python310-scone-lithops350
+MADE_IMAGE=registry.scontain.com/amiguel/neardatapublic/lithops:git_alpine_python310-scone-lithops350.1
 DOCKERFILE=Dockerfile.lithops.python3.10.4.patches
 LT_VERSION="${LT_VERSION:=3.5.0}"
 
@@ -15,5 +17,5 @@ LT_VERSION="${LT_VERSION:=3.5.0}"
 
 ###
 # Build SCONE Kubernetes prepared image
-docker build --no-cache --progress plain --build-arg BASE_IMAGE=${BASE_IMAGE}.int --build-arg LT_VERSION=$LT_VERSION -f $DOCKERFILE -t $MADE_IMAGE .
+docker build --no-cache --progress plain --build-arg BASE_IMAGE=${BASE_IMAGE} --build-arg LT_VERSION=$LT_VERSION -f $DOCKERFILE -t $MADE_IMAGE .
 docker push $MADE_IMAGE 2>&1 |tail -5

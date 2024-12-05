@@ -13,7 +13,7 @@ WORKDIR /python
 
 ARG LT_VERSION
 
-RUN apk add python3 python3-dev py3-pip && pip3 install --upgrade pip setuptools wheel && pip3 install pyopenssl
+RUN apk add python3 python3-dev py3-pip && pip3 install --upgrade pip setuptools==69.5.1 wheel && pip3 install pyopenssl
 RUN pip install --upgrade numpy
 RUN pip install --upgrade scipy
 RUN pip install --upgrade pandas
@@ -31,8 +31,6 @@ RUN apk add git
 RUN apk add curl curl-dev
 RUN apk add libxml2-dev
 
-
-
 RUN apk add llvm14
 RUN apk add llvm14-libs
 RUN apk add llvm14-dev
@@ -41,7 +39,6 @@ RUN apk add libffi
 RUN apk add libffi-dev
 
 WORKDIR /python/arrow
-RUN pip install --upgrade pip setuptools wheel
 RUN pip install --upgrade arrow
 RUN pip install --upgrade archery
 RUN pip install --upgrade lint
