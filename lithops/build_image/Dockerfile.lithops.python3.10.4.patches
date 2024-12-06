@@ -25,7 +25,14 @@ COPY files/$LT_VERSION/storage.py /lithops/lithops/storage/storage.py
 COPY files/$LT_VERSION/status.py /usr/lib/python3.10/site-packages/lithops/worker/status.py
 COPY files/$LT_VERSION/status.py /lithops/lithops/worker/status.py
 
-RUN sed -i -e 's/collections.Callable/collections.abc.Callable/' /usr/lib/python3.10/site-packages/pika/utils.py
-COPY files/$LT_VERSION/monitor.py /usr/lib/python3.10/site-packages/lithops/monitor.py
-COPY files/$LT_VERSION/monitor.py /lithops/lithops/monitor.py
+# RUN sed -i -e 's/collections.Callable/collections.abc.Callable/' /usr/lib/python3.10/site-packages/pika/utils.py
+#COPY files/$LT_VERSION/monitor.py /usr/lib/python3.10/site-packages/lithops/monitor.py
+#COPY files/$LT_VERSION/monitor.py /lithops/lithops/monitor.py
 
+#RUN echo "sed -i -e 's/collections.Callable/collections.abc.Callable/' /usr/lib/python3.10/site-packages/pika/utils.py" >/pika-utils.txt
+#COPY files/$LT_VERSION/monitor.py /monitor.py
+
+#RUN grep -Hn PROCFS_PATH.*= /usr/lib/python3.10/site-packages/psutil/__init__.py
+#RUN sed -i -e 's~PROCFS_PATH = "/proc"~PROCFS_PATH = "/proc/self"~' /usr/lib/python3.10/site-packages/psutil/__init__.py
+#RUN grep -Hn PROCFS_PATH.*= /usr/lib/python3.10/site-packages/psutil/__init__.py
+RUN rm -rf /usr/lib/python3.10/site-packages/psutil*
