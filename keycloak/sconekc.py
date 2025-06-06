@@ -72,6 +72,9 @@ def showJWT(JWT):
     print("Token:   ", end="")
     pprint.pprint(jwt)
 
+    print("Signature:   ", end="")
+    pprint.pprint(signature)
+
     print("Issued at:  {} (localtime)".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(jwt['iat'])) if 'iat' in jwt else 'Undefined'))
     print("Not before: {} (localtime)".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(jwt['nbf'])) if 'nbf' in jwt else 'Undefined'))
     print("Expiration: {} (localtime)".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(jwt['exp'])) if 'exp' in jwt else 'Undefined'))
