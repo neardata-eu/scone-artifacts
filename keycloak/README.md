@@ -83,8 +83,8 @@ With the validation token:
 ### Use case: unsuccessful
 
 Same **realm** and **client**, but different **username** and **password**:
-* `USERNAME2='haneks'`
-* `PASSWORD2='Skfo42fdr872'`
+* `USERNAME2='kellsen'`
+* `PASSWORD2='jR4glB3fJxqP'`
 
 Obtain an access token:
 * `AT=kc.get_access_token(f'https://keycloak.neardata.eu:30443/realms/{REALM}/protocol/openid-connect/token', f'{CLIENT}', f'{USERNAME2}', f'{PASSWORD2}', cert='cert.pem', key='key.pem')`
