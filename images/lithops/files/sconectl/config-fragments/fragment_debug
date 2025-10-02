@@ -1,0 +1,81 @@
+name: {{namespace}}/{{sconeLithopsImageUnderline}}_debug
+version: 0.3.10
+predecessor: {{predecessor}}
+
+access_policy:
+  read:
+    - {{CREATOR}}
+  update:
+    - {{CREATOR}}
+    - signer: "{{SIGNER}}"
+
+creator:
+  {{SESSION_CREATOR}}
+  
+secrets:
+ - name: image_latest
+   kind: ascii
+   value: {{sconeLithopsImage}}_debug_latest
+   export_public: true
+
+ - name: image_stable
+   kind: ascii
+   value: 
+   export_public: true
+
+ - name: SCONE_SESSION_ID_
+   kind: ascii
+   value: "f0NB70DIKvGYdtHWVJP8"
+
+
+ - name: mrenclaves
+   kind: config-fragment
+   export_public: true
+   value:
+     mrenclave:
+       - {{sconeHashPythonLithops}}
+
+ - name: mrsigner
+   kind: config-fragment
+   export_public: true
+   value:
+     - signer:
+         mrsigner: {{sconeMrsigner1}}
+         isvprodid: 0
+         isvsvn_min: 0
+
+ - name: mrsigner_mrenclave
+   kind: config-fragment
+   export_public: true
+   value:
+     - signer:
+         mrsigner: {{sconeMrsigner2}}
+         isvprodid: 0
+         isvsvn_min: 0
+       mrenclave:
+         - {{sconeHashPythonLithops}}
+     - signer:
+         mrsigner: {{sconeMrsigner1}}
+         isvprodid: 0
+         isvsvn_min: 0
+       mrenclave:
+         - {{sconeHashPythonLithops}}
+
+
+ - name: mrsigner_mrenclave_versions
+   kind: config-fragment
+   export_public: true
+   value:
+     - signer:
+         mrsigner: {{sconeMrsigner2}}
+         isvprodid: 0
+         isvsvn_min: 0
+       mrenclave:
+         - {{sconeHashPythonLithops}}
+     - signer:
+         mrsigner: {{sconeMrsigner1}}
+         isvprodid: 0
+         isvsvn_min: 0
+       mrenclave:
+         - {{sconeHashPythonLithops}}
+

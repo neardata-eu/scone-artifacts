@@ -1,0 +1,22 @@
+#FROM registry.scontain.com/sconecuratedimages/crosscompilers:ubuntu
+FROM registry.scontain.com/sconecuratedimages/crosscompilers:ubuntu-scone5.9.0
+
+ENV LANG=C.UTF-8
+
+RUN apt update && apt -y install git
+RUN git clone https://github.com/rcrane/pravega-rust-benchmark.git prb
+
+# mig
+#RUN scone cargo update -p zerofrom@0.1.6 --precise 1.70.0
+
+RUN cd prb && scone cargo build --release
+
+ENV SCONE_VERSION=1
+ENV SCONE_HEAP=12G
+ENV SCONE_LOG=DEBUG
+
+WORKDIR /prb
+
+# docker run --rm -it --network=host -v ${PWD}/prb/scone/:/results omb_scone /bin/bash -c "./target/release/pravega-rust-benchmark workloads/TC31.yaml && cp /prb/*.yaml /results/"
+
+

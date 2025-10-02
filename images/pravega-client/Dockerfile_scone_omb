@@ -1,0 +1,20 @@
+FROM alpine:3.18 AS builder
+
+ENV LANG=C.UTF-8
+RUN apk update && apk upgrade && apk add git maven
+RUN git clone https://github.com/rcrane/om-benchmark.git omb
+RUN cd omb && mvn clean verify package -X -DskipTests -Dspotbugs.skip=true
+
+FROM registry.scontain.com/sconecuratedimages/apps:18-ea-jdk-alpine-scone5.9
+
+COPY --from=builder /omb/package/target/openmessaging-benchmark-0.0.1-SNAPSHOT-bin.tar.gz /
+
+RUN tar -xzvf openmessaging-benchmark-0.0.1-SNAPSHOT-bin.tar.gz
+
+ENV SCONE_HEAP=12G
+ENV SCONE_LOG=DEBUG
+
+WORKDIR /openmessaging-benchmark-0.0.1-SNAPSHOT
+
+# docker run --rm -it --network=host --device=/dev/sgx_enclave -v ${PWD}/omb-container/omb/sgx/:/results omb_scone /bin/sh -c "./bin/benchmark workloads/pravega_simple.yaml --drivers driver-pravega/pravega.yaml && ls /openmessaging-benchmark-0.0.1-SNAPSHOT/* && cp /openmessaging-benchmark-0.0.1-SNAPSHOT/*.yaml /results/"
+

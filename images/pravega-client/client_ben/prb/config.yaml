@@ -1,0 +1,10 @@
+# Workload configuration file
+name: CONFIG_EXAMPLE
+address: "172.16.3.11:9090"
+payload_file: "payload/payload-1MB.data"
+message_num: 30000
+producer_rate: 100
+message_warmup: 100
+scope: testcase
+stream: testcase
+

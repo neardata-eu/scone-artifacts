@@ -1,0 +1,102 @@
+# Default values for application
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+lithops_server:
+  # How many Lithops servers to be deployed.
+  replicaCount: {{ltKubeReplicas}}
+
+image: {{image_name}}
+imagePullPolicy: Always
+
+imagePullSecrets:
+  - name: {{imagePullSecrets}}
+
+nameOverride: ""
+fullnameOverride: {{service_name}}
+
+resources:
+  requests:
+    memory: "{{ltKubeRequestsMem}}"
+    cpu: "{{ltKubeRequestsCpu}}"
+    "sgx.k8s.io/sgx": 1
+  limits:
+    memory: "{{ltKubeLimitsMem}}"
+    cpu: "{{ltKubeLimitsCpu}}"
+    "sgx.k8s.io/sgx": 1
+
+scone:
+  scone_version: 1
+  scone_log: {{ltSconeLog}}
+  # If enabled, inject attestation information in
+  # Lithops environment: SCONE_CAS_ADDR, SCONE_LAS_ADDR
+  # and SCONE_CONFIG_ID.
+  attestation:
+    enabled: true
+    lasUseHostIP: true
+    cas: {{cas.cas.cas_url}}
+    LithopsConfigID: {{session}}/lithops-singularity
+
+# Define any SCONE-related variables. 
+  env:
+    - name: SCONE_EDMM_MODE
+      value: {{ltSconeEdmm}}
+    - name: SCONE_MIN_HEAP
+      value: {{ltSconeMinHeap}}
+    - name: SCONE_HEAP
+      value: {{ltSconeHeap}}
+    - name: SCONE_MODE
+      value: {{ltSconeMode}}
+    - name: SCONE_FORK
+      value: "{{ltSconeFork}}"
+    - name: SCONE_FORK_OS
+      value: "{{ltSconeForkOs}}"
+    - name: SCONE_ALLOW_DLOPEN
+      value: "{{ltSconeAllowDlOpen}}"
+    - name: SCONE_SYSLIBS
+      value: "{{ltSconeSysLibs}}"
+
+# Application environment variables
+# ATTENTION: do NOT include SCONE related variable inside this block, to avoid overwriting
+application:
+  env:
+    - name: PYTHON_GIL
+      value: "{{ltPythonGil}}"
+  params:
+    rabbitmqUser: {{rabbitmqUser}}
+    rabbitmqPassword: {{rabbitmqPassword}}
+    rabbitmqServerPort: {{rabbitmqServerPort}}
+    rabbitmqUrl: {{rabbitmqUrl}}
+
+
+persistence: {}
+
+securityContext: {}
+
+service: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+#  nodeAffinity:
+#    requiredDuringSchedulingIgnoredDuringExecution:
+#      nodeSelectorTerms:
+#      - matchExpressions:
+#        - key: kubernetes.io/hostname
+#          operator: In
+#          values:
+#          - scontain-worker3
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  #annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  #name:
+
+useSGXDevPlugin: {{useSGXDevPlugin}}
+sgxEpcMem: {{sgxEpcMem}}

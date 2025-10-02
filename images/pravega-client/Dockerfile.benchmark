@@ -1,0 +1,30 @@
+FROM registry.scontain.com/scone.cloud/crosscompilers-ubuntu:5.9.0-rc.7 AS cross
+
+RUN apt update
+RUN apt install -y git less
+
+RUN git clone https://github.com/neardata-eu/pravega-rust-benchmark/ /pravega
+
+WORKDIR /pravega
+RUN scone cargo build
+
+###
+#
+FROM ubuntu:20.04 AS base
+
+COPY --from=cross /pravega/target/x86_64-scone-linux-musl/debug/pravega-rust-benchmark /usr/bin/
+COPY --from=cross /pravega/config.yaml /
+COPY --from=cross /opt/scone/lib/ld-scone-x86_64.so.1      /opt/scone/lib/ld-scone-x86_64.so.1
+COPY --from=cross /opt/scone/lib/libc.scone-x86_64.so.1    /opt/scone/lib/libc.scone-x86_64.so.1
+RUN ln -s /opt/scone/lib/ld-scone-x86_64.so.1              /lib/ld-scone-x86_64.so
+
+WORKDIR /pravega
+COPY --from=cross /pravega/LICENSE     ./
+COPY --from=cross /pravega/README.md   ./
+COPY --from=cross /pravega/config.yaml ./
+COPY --from=cross /pravega/payload     ./
+COPY --from=cross /pravega/report.sh   ./
+
+ENTRYPOINT [ "pravega-rust-benchmark" ]
+
+CMD ["pravega-rust-benchmark", "config.yaml" ]

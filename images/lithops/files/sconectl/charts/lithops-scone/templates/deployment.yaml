@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "lithops-scone.fullname" . }}
+  labels:
+    {{- include "lithops-scone.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.lithops_server.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "lithops-scone.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "lithops-scone.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
+      containers:
+        ###
+        # Application server
+        - name: server
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image }}"
+          imagePullPolicy: Always
+          {{- if .Values.scone.attestation.enabled }}
+          command: ["python3.13"]
+          {{- else }}
+          command: ["python3.13", "entry_point.py", "amqp://{{ .Values.application.params.rabbitmqUser }}:{{ .Values.application.params.rabbitmqPassword }}@{{ .Values.application.params.rabbitmqServerPort }}/{{ .Values.application.params.rabbitmqUrl }}"]
+          {{- end }}
+
+          env:
+            {{- if .Values.scone.attestation.enabled }}
+            - name: SCONE_CONFIG_ID
+              value: {{ .Values.scone.attestation.LithopsConfigID }}
+            - name: SCONE_CAS_ADDR
+              value: {{ .Values.scone.attestation.cas }}
+            - name: SCONE_LAS_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            {{- end }}
+            - name: SCONE_LOG
+              value: {{ .Values.scone.scone_log | quote }}
+            - name: SCONE_VERSION
+              value: {{ .Values.scone.scone_version | quote }}
+            {{- if .Values.scone.env }}
+              {{ toYaml .Values.scone.env | nindent 12 }}
+            {{- end }}
+
+            ###
+            # Application environment variables
+            # ATTENTION: do NOT include SCONE related variable inside this block, to avoid overwriting
+            {{- if .Values.application.env }}
+              {{ toYaml .Values.application.env | nindent 12 }}
+            {{- end }}
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+---
+

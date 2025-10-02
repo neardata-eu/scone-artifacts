@@ -1,0 +1,65 @@
+name: {{session}}
+version: "0.3.10" 
+predecessor: {{predecessor}}
+
+access_policy: $$SCONE::access_policy$$
+
+creator:
+  {{session_creator}}
+
+security: $$SCONE::security_policy$$
+
+services:
+  #####
+  # server policy
+  - name: lithops-singularity
+    image_name: app_image
+    command: python3.13 entry_point.py "amqp://{{rabbitmqUser}}:{{rabbitmqPassword}}@{{rabbitmqServerPort}}/{{rabbitmqUrl}}"
+    environment: # generated from service manifest
+      #####
+      # application configuration
+      PYTHON_GIL: "{{ltPythonGil}}"
+
+      #####
+      # SCONE configuration
+      SCONE_LOG: {{ltSconeLog}}
+      SCONE_FORK: "{{ltSconeFork}}"
+      SCONE_FORK_OS: "{{ltSconeForkOs}}"
+      SCONE_ALLOW_DLOPEN: "{{ltSconeAllowDlOpen}}"
+      SCONE_SYSLIBS: "{{ltSconeSysLibs}}"
+
+    attestation:
+      - $$SCONE::attestation_service$$
+    pwd: /app
+
+
+###
+# services images: configurations, files and secret injections for each service
+# - app_image: Keycloak configurations
+images:
+  - name: app_image
+
+secrets:
+  - name: access_policy
+    import:
+      session: {{access_policy_name}}
+      secret: access_policy 
+      cas_url: {{cas.access.cas_url}}
+      cas_key: {{cas.access.cas_key}}
+  - name: security_policy 
+    import:
+      session: {{security_policy_name}}
+      secret: security_policy
+      cas_url: {{cas.security.cas_url}}
+      cas_key: {{cas.security.cas_key}}
+  - name: SCONE_SESSION_ID_
+    kind: ascii
+    value: "{{RANDOM}}"
+
+  - name: attestation_service
+    import:
+      session: {{image_policy_name}}
+      secret: mrsigner_mrenclave_versions
+      cas_url: {{cas.image.cas_url}}
+      cas_key: {{cas.image.cas_key}}
+
