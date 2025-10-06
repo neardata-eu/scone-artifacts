@@ -2,7 +2,7 @@
 
 echo "..:INF: Usage: [ TARGET_IMAGE=organizationaldocker/lithops:version ] $0 [ push ] # argument "push" will push the generated image to the \$TARGET_IMAGE"
 
-set -eux
+set -ex
 
 PUSH=0
 
@@ -11,7 +11,7 @@ DOCKERFILE=Dockerfile
 
 docker build --progress plain -f $DOCKERFILE -t $TARGET_IMAGE .
 
-if [[ "x$2" == "xpush" ]]; then
+if [[ "x$1" == "xpush" ]]; then
     PUSH=1
 fi
 
