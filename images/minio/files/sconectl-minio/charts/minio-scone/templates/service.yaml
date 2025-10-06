@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "minio-scone.fullname" . }}
+  labels:
+    {{- include "minio-scone.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if (eq .Values.service.type "ClusterIP") }}
+  clusterIP: None
+  {{- end }}
+  ports:
+    - port: {{ .Values.service.service_port }}
+      targetPort: mnservice
+      protocol: TCP
+      name: mnservice
+    - port: {{ .Values.service.console_port }}
+      targetPort: mnconsole
+      protocol: TCP
+      name: mnconsole
+  selector:
+    {{- include "minio-scone.selectorLabels" . | nindent 4 }}

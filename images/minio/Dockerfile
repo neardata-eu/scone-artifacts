@@ -1,8 +1,8 @@
 FROM registry.scontain.com/sconecuratedimages/experimental/minio:master-alpine3.21-5.9.0-831-g2f59cb75a AS base
 
-COPY ./minio_server.sh /minio_server.sh
-COPY ./make_binary-fs.demo.sh /make_binary-fs.demo.sh
-COPY ./make_fspf.demo.sh /make_fspf.demo.sh
+COPY ./files/minio_server.sh /minio_server.sh
+COPY ./files/make_binary-fs.demo.sh /make_binary-fs.demo.sh
+COPY ./files/make_fspf.demo.sh /make_fspf.demo.sh
 
 RUN set -eux; \
     chmod +x /minio_server.sh /make_binary-fs.demo.sh /make_fspf.demo.sh

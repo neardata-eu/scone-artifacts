@@ -1,0 +1,116 @@
+# Default values for application
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+minio-server:
+  # How many Minio servers to be deployed.
+  replicaCount: 1
+
+image: {{image_name}}
+imagePullPolicy: Always
+
+imagePullSecrets:
+  - name: {{imagePullSecrets}}
+
+nameOverride: ""
+fullnameOverride: {{service_name}}
+
+resources:
+  limits:
+    "sgx.k8s.io/sgx": 1
+
+scone:
+  scone_version: 1
+  scone_log: {{mnSconeLog}}
+  # If enabled, inject attestation information in
+  # Minio environment: SCONE_CAS_ADDR, SCONE_LAS_ADDR
+  # and SCONE_CONFIG_ID.
+  attestation:
+    enabled: true
+    lasUseHostIP: true
+    cas: {{cas.cas.cas_url}}
+    MinioConfigID: {{session}}/minio
+
+# Define any SCONE-related variables. 
+  env:
+    - name: SCONE_EDMM_MODE
+      value: {{mnSconeEdmm}}
+    - name: SCONE_MIN_HEAP
+      value: {{mnSconeMinHeap}}
+    - name: SCONE_HEAP
+      value: {{mnSconeHeap}}
+    - name: SCONE_MODE
+      value: auto
+
+# Application environment variables
+# ATTENTION: do NOT include SCONE related variable inside this block, to avoid overwriting
+application:
+  env:
+    - name: SERVICEADDRESS
+      value: "{{mnServiceAddress}}"
+    - name: CONSOLEADDRESS
+      value: "{{mnConsoleAddress}}"
+    - name: MINIO_ROOT_USER
+      value: minioroot
+    - name: MINIO_ROOT_PASSWORD
+      value: sc0n35EC4e7
+    - name: PATH
+      value: /go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    - name: MC_CONFIG_DIR
+      value: /tmp/.mc
+    - name: MINIO_ACCESS_KEY_FILE
+      value: access_key
+    - name: MINIO_SECRET_KEY_FILE
+      value: secret_key
+    - name: MINIO_ROOT_USER_FILE
+      value: access_key
+    - name: MINIO_ROOT_PASSWORD_FILE
+      value: secret_key
+    - name: MINIO_KMS_SECRET_KEY_FILE
+      value: kms_master_key
+    - name: MINIO_UPDATE_MINISIGN_PUBKEY
+      value: RWTx5Zr1tiHQLwG9keckT0c45M3AGeHD6IvimQHpyRywVWGbP1aVSGav
+    - name: MINIO_CONFIG_ENV_FILE
+      value: config.env"
+
+
+env: {}
+
+persistence:
+  ## Volumes identification
+  pvc_identification: {{pvc_identification}}
+
+securityContext: {}
+
+service:
+  # we use a Headless Service to expose statefulsets.
+  type: ClusterIP
+  # type: NodePort
+  #+clusterip: 10.104.77.254
+  # If type=NodePort, you can define a custom NodePort.
+  # This port must be available on all nodes.
+  service_port: {{mnServicePort}}
+  console_port: {{mnConsolePort}}
+
+# The *_host variables represent the hostnames seen by the cluster
+# The *_fqdn variables should be the same as the CN used to generate the server TLS/x509 certificate
+minio_host: {{minio_host}}
+minio_fqdn: {{minio_fqdn}}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  #annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  #name:
+
+useSGXDevPlugin: {{useSGXDevPlugin}}
+sgxEpcMem: {{sgxEpcMem}}
