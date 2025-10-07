@@ -1,0 +1,95 @@
+# Persistent volume claims used to keep MariaDB data.
+# The data is protected by SCONE transparent encryption
+# and the keys are managed by SCONE CAS.
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kc-$PVC_IDENTIFICATION-maria-data-pvc
+  namespace: $DEFAULT_NAMESPACE
+spec:
+  accessModes:
+  - ReadWriteOnce
+  # If not using the default storage class,
+  # CUSTOM_STORAGE_CLASS is replaced by
+  # setup.sh
+#  storageClassName: $CUSTOM_STORAGE_CLASS
+  resources:
+    requests:
+      storage: 8Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kc-$PVC_IDENTIFICATION-maria-external-pvc
+  namespace: $DEFAULT_NAMESPACE
+spec:
+  accessModes:
+  - ReadWriteOnce
+  # If not using the default storage class,
+  # CUSTOM_STORAGE_CLASS is replaced by
+  # setup.sh
+#  storageClassName: $CUSTOM_STORAGE_CLASS
+  resources:
+    requests:
+      storage: 4Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kc-$PVC_IDENTIFICATION-maria-vartmp-pvc
+  namespace: $DEFAULT_NAMESPACE
+spec:
+  accessModes:
+  - ReadWriteOnce
+  # If not using the default storage class,
+  # CUSTOM_STORAGE_CLASS is replaced by
+  # setup.sh
+#  storageClassName: $CUSTOM_STORAGE_CLASS
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kc-$PVC_IDENTIFICATION-keycloak-hashes-pvc
+  namespace: $DEFAULT_NAMESPACE
+spec:
+  accessModes:
+  - ReadWriteOnce
+  # If not using the default storage class,
+  # CUSTOM_STORAGE_CLASS is replaced by
+  # setup.sh
+#  storageClassName: $CUSTOM_STORAGE_CLASS
+  resources:
+    requests:
+      storage: 50Mi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kc-$PVC_IDENTIFICATION-set-minio-data-pvc
+  namespace: $DEFAULT_NAMESPACE
+spec:
+  accessModes:
+  - ReadWriteOnce
+  # If not using the default storage class,
+  # CUSTOM_STORAGE_CLASS is replaced by
+  # setup.sh
+#  storageClassName: $CUSTOM_STORAGE_CLASS
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+
+
+######
+## mig from KC DB
+#####
+

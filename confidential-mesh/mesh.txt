@@ -1,0 +1,156 @@
+####
+# Configuration variables to be used by "run.sh" to setup the mesh of services
+# supported by SCONECTL
+#
+# Except APP_NAMESPACE, all the other namespaces have to be defined, together
+# with the PVC identification
+#
+# If the 'default' namespace is being used, it has to be explicitely defined
+# The PVC identification refers to specific means to differentiate from others
+# especially when there is more than one mesh of the same services deployed
+# in the same namespace. Hence, either the namespace itself can be used or
+# another particular identification
+#
+# On the other hand, APP_NAMESPACE refers to the policies registered in CAS
+# so either a new namespace is created by the installation script or it is
+# retrieved from the file "release.sh" by the installation script
+# Its value is composed by numbers randomly generated, started by MESH_PREFIX
+#
+# Example of installation in "default" namespace
+# PRIV_CAS_NAMESPACE=default
+# CLUSTER_NAMESPACE=default
+# PVC_IDENTIFICATION=keycloak307
+# MESH_PREFIX=ciammesh
+
+###
+# Public CAS setup. Parameter "--cas public" for run.sh
+# Name and tolerance can be configured
+PUB_CAS_URL=5-8-0.scone-cas.cf
+PUB_CAS_TOLERANCE="--only_for_testing-trust-any --only_for_testing-debug  --only_for_testing-ignore-signer -C -G -S"
+
+###
+# Private CAS setup. Parameter "--cas private" for run.sh
+# Name and tolerance can be configured, along with the CAS KEY
+# If a different CAS Key is found during setup, the configuration can be abprted. Currently
+# it is programed to warn and move on
+PRIV_CAS_NAMESPACE=default
+PRIV_CAS_URL=neardata-cas-v1
+PRIV_CAS_KEY=4REHj3wFQRt6yi5b3c5BDnRLLxyuotTq9y1FDbz9FRNDb32kxQ
+PRIV_CAS_TOLERANCE="--accept-configuration-needed --accept-group-out-of-date --accept-sw-hardening-needed"
+
+###
+# Operator CAS setup. Parameter "--cas operator" for run.sh
+# Name and tolerance can be configured, along with the CAS KEY
+# If a different CAS Key is found during setup, the configuration can be abprted. Currently
+# it is programed to warn and move on
+OPER_CAS_NAMESPACE=default
+OPER_CAS_URL=cas-operator
+OPER_CAS_KEY=4REHj3wFQRt6yi5b3c5BDnRLLxyuotTq9y1FDbz9FRNDb32kxQ
+OPER_CAS_TOLERANCE="--accept-configuration-needed --accept-group-out-of-date --accept-sw-hardening-needed"
+
+###
+# CAS Mode is set to Signed manifest, during development/troubleshooting
+# Works for both "private" and "operator" modes
+# PRIV_CAS_MODE=EncryptedManifest
+PRIV_CAS_MODE=SignedManifest
+PRIV_CAS_SESSION_ENCRYPTION_KEY=3704f3e07fafb5961259f12e9c751bb8419b9b90067afa65acd028c9992dbdee
+
+###
+# Namespace and identification variables -- as explained above
+# APP_NAMESPACE=""
+CLUSTER_NAMESPACE=default
+PVC_IDENTIFICATION=storage-abc
+MESH_PREFIX=services-corp
+
+###
+# Used when an image is produced on runtime by SCONECTL
+PUSH_IMAGE_REPO=registry.scontain.com/sconecuratedimages/experimental
+
+###
+# Database service image
+MARIADB_MESH_IMAGE=registry.scontain.com/sconecuratedimages/experimental/mariadb:10.4.24-sconectl-keycloak-5.8.0
+
+###
+# Application service images
+# Keycloak and PKCS12 credential generator
+# Java version is used to setup LD_LIBRARY_PATH and JAVA_HOME
+JAVA_VERSION=21
+KEYCLOAK_MESH_IMAGE=registry.scontain.com/sconecuratedimages/experimental/keycloak:26-alpine3.20-sconectl-5.9.0-rc.5
+PKCS12_MESH_IMAGE=registry.scontain.com/sconecuratedimages/experimental/python:3.10-pkcsandcas-5.9.0-rc.11
+
+###
+# Cloud storage service image
+MINIO_MESH_IMAGE=registry.scontain.com/sconecuratedimages/experimental/minio:master-alpine3.21-sconectl-5.9.0-831-g2f59cb75a
+MINIO_SCONE_MIN_HEAP=50M
+MINIO_SCONE_HEAP=7G
+MINIO_SCONE_STACK=8M
+MINIO_SCONE_EDMM_MODE=auto
+MINIO_SCONE_ALLOW_DLOPEN=2
+MINIO_SERVICE_PORT=9000
+MINIO_CONSOLE_PORT=9001
+MINIO_SERVICE_ADDRESS=:9000
+MINIO_CONSOLE_ADDRESS=:9001
+
+###
+# Keycloak configuration to be passed to policies
+# 
+# HTTP and HTTPS service ports
+# client PKCS12 credentials
+# KC_VERSION                        - Keycloak version
+# KEYCLOAK_ADMIN_USER               - Administrative user
+# KEYCLOAK_ADMIN_PASSWORD           - Administrative password
+# KEYCLOAK_HTTP_PORT                - insecure Keycloak client service port; often necessary for compatibility
+# KEYCLOAK_HTTPS_PORT               - confidential Keycloak client service port
+# SFX_PKCS_SESSION                  - suffix to identify the auxiliary policy containing the database access credentials in PKCS#12 format
+# credentials in PKCS#12 format; is used to setup an auxiliary policy to store MariaDB
+# JAVA_*                            - JVM parameters are essential to run the application
+# SCONE enclave setup variables
+KC_VERSION=26.0.0
+KEYCLOAK_ADMIN_USERNAME=admin
+KEYCLOAK_ADMIN_PASSWORD=admin
+KEYCLOAK_DB_MANAGER=mariadb
+KEYCLOAK_HTTP_PORT=30080
+KEYCLOAK_HTTPS_PORT=30443
+SUFIX_PKCS12_SESSION=aux-2
+KEYCLOAK_ADDITIONAL_PARAMS=--features=preview --features=passkeys
+KEYCLOAK_JAVA_XMS=256m
+KEYCLOAK_JAVA_XMX=2048m
+KEYCLOAK_JAVA_METASPACESIZE=96M
+KEYCLOAK_JAVA_MAXMETASPACESIZE=256m
+KEYCLOAK_SCONE_MIN_HEAP=50m
+KEYCLOAK_SCONE_HEAP=12G
+KEYCLOAK_SCONE_STACK=8M
+KEYCLOAK_SCONE_EDMM_MODE=auto
+
+###
+# Lithops
+#
+LITHOPS_MESH_IMAGE=registry.scontain.com/sconecuratedimages/experimental/lithops:3.6.1-metaspace-5.9.0-239-g941a371d1
+LITHOPS_CLUSTER_REPLICAS=6
+LITHOPS_REQUESTS_MEMORY=16Gi
+LITHOPS_REQUESTS_CPU=12
+LITHOPS_LIMITS_MEMORY=24Gi
+LITHOPS_LIMITS_CPU=20
+LITHOPS_SCONE_LOG=ERROR
+LITHOPS_PYTHON_GIL=0
+LITHOPS_SCONE_HEAP=7G
+LITHOPS_SCONE_STACK=8M
+LITHOPS_SCONE_MODE=SIM
+LITHOPS_SCONE_MIN_HEAP=50m
+LITHOPS_SCONE_EDMM_MODE=auto
+LITHOPS_SCONE_FORK=1
+LITHOPS_SCONE_FORK_OS=1
+LITHOPS_SCONE_ALLOW_DLOPEN=2
+LITHOPS_SCONE_SYSLIBS=1
+LITHOPS_RABBITMQ_USER=ltsingularity
+LITHOPS_RABBITMQ_PASSWORD=L751nguL44itY
+LITHOPS_RABBITMQ_ADDRESS=192.168.23.45
+LITHOPS_RABBITMQ_URL=faas
+
+###
+# hostnames
+DNS_DOMAIN=neardata.eu
+MARIADB_HOSTNAME=mariadb
+KEYCLOAK_HOSTNAME=keycloak
+MINIO_HOSTNAME=minio
+LITHOPS_HOSTNAME=lithops
