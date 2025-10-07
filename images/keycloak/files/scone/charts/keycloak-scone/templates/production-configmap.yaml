@@ -1,0 +1,13 @@
+######################################################
+# embedded scripts and files used for auxiliary functions
+{{- if (.Files.Glob "files/scripts/*.{sh,yaml,py}")  }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "keycloak-scone.fullname" . }}-init-scripts
+  labels: {{- include "keycloak-scone.labels" . | nindent 4 }}
+data:
+{{- if (.Files.Glob "files/scripts/*.{sh,yaml,py}") }}
+{{ (.Files.Glob "files/scripts/*.{sh,yaml,py}").AsConfig | indent 2 }}
+{{- end }}
+{{ end }}

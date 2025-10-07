@@ -1,0 +1,163 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "keycloak-scone.fullname" . }}
+  labels:
+    {{- include "keycloak-scone.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "keycloak-scone.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "keycloak-scone.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
+      initContainers:
+        ###
+        # Wait until database is ready
+        - name: init-wait-db
+          image: "{{ .Values.image }}"
+          imagePullPolicy: Always
+          command:
+            - bash
+            - -cx
+            - "while sleep 9; do if [ 0 -lt `nmap -Pn -sT {{ .Values.database_host }} -p {{ .Values.database_port }} -oG /dev/stdout |grep open |wc -l` ]; then nmap -Pn -sT {{ .Values.database_host }} -p {{ .Values.database_port }}; break; fi; done"
+
+        ###
+        # Create updated credentials to access database
+        - name: init-make-pkcs12
+          image: "{{ .Values.imagePython }}"
+          imagePullPolicy: Always
+          command:
+            - python3
+            - /python/pkcsandcas.py
+          env:
+            {{- if .Values.scone.attestation.enabled }}
+            - name: SCONE_CONFIG_ID
+              value: {{ .Values.scone.attestation.PySaverConfigID }}
+            - name: SCONE_CAS_ADDR
+              value: {{ .Values.scone.attestation.cas }}
+            - name: SCONE_LAS_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            {{- end }}
+            - name: SCONE_HEAP
+              value: 1G
+            - name: SCONE_MODE
+              value: auto
+            - name: SCONE_SYSLIBS
+              value: "1"
+            - name: SCONE_VERSION
+              value: "1"
+            - name: SCONE_LOG
+              value: {{ .Values.scone.scone_log | quote }}
+            - name: SFX_PKCS_SESSION
+              value: {{ .Values.env.suffixPkcsSession }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+          ###
+          # Scripts and files necessary to create autiliary policy
+          volumeMounts:
+            {{- if (.Files.Glob "files/scripts/*.{sh,py}") }}
+            - name: custom-init-scripts
+              mountPath: /production/bin
+            {{- end }}
+            {{- if (.Files.Glob "files/auxiliary/*.yaml") }}
+            - name: auxiliary-policies
+              mountPath: /production/policies
+            {{- end }}
+            - name: prodhashes
+              mountPath: /production/hashes
+
+      containers:
+        ###
+        # Application server
+        - name: server
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image }}"
+          imagePullPolicy: Always
+          {{- if .Values.scone.attestation.enabled }}
+          command: ["java"]
+          {{- else }}
+          command: ["kc.sh", "--verbose", "start", "--hostname={{ .Values.keycloak_fqdn }}", "--http-enabled=true"]
+          {{- end }}
+
+          env:
+            {{- if .Values.scone.attestation.enabled }}
+            - name: SCONE_CONFIG_ID
+              value: {{ .Values.scone.attestation.KeycloakConfigID }}
+            - name: SCONE_CAS_ADDR
+              value: {{ .Values.scone.attestation.cas }}
+            - name: SCONE_LAS_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            {{- end }}
+            - name: SCONE_LOG
+              value: {{ .Values.scone.scone_log | quote }}
+            - name: SCONE_VERSION
+              value: {{ .Values.scone.scone_version | quote }}
+            {{- if .Values.scone.env }}
+              {{ toYaml .Values.scone.env | nindent 12 }}
+            {{- end }}
+
+            ###
+            # Application environment variables
+            # ATTENTION: do NOT include SCONE related variable inside this block, to avoid overwriting
+            {{- if .Values.application.env }}
+              {{ toYaml .Values.application.env | nindent 12 }}
+            {{- end }}
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+          volumeMounts:
+            {{- if (.Files.Glob "files/scripts/*.sh") }}
+            - name: custom-init-scripts
+              mountPath: /production/bin
+            {{- end }}
+            - name: prodhashes
+              mountPath: /production/hashes
+      volumes:
+        - name: configmap-start
+          configMap:
+            defaultMode: 0755
+            name: start--sh
+        {{- if (.Files.Glob "files/scripts/*.{sh,py}") }}
+        - name: custom-init-scripts
+          configMap:
+            name: {{ template "keycloak-scone.fullname" . }}-init-scripts 
+            defaultMode: 511
+        {{- end }}
+
+        {{- if (.Files.Glob "files/auxiliary/*.yaml") }}
+        - name: auxiliary-policies
+          configMap:
+            name: {{ template "keycloak-scone.fullname" . }}-auxiliary-policies
+            defaultMode: 0666
+        {{- end }}
+        - name: prodhashes
+          persistentVolumeClaim:
+            claimName: kc-{{ .Values.persistence.pvc_identification }}-keycloak-hashes-pvc
+
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+---

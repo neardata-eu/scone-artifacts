@@ -1,0 +1,123 @@
+# Default values for application
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+keycloak-server:
+  # How many Keycloak servers to be deployed.
+  replicaCount: 1
+
+image: {{image_name}}
+imagePython: {{imagePython}}
+imagePullPolicy: Always
+
+imagePullSecrets:
+  - name: {{imagePullSecrets}}
+
+nameOverride: ""
+fullnameOverride: {{service_name}}
+
+resources:
+  limits:
+    "sgx.k8s.io/sgx": 1
+
+scone:
+  scone_version: 1
+  scone_log: {{kcSconeLog}}
+  # If enabled, inject attestation information in
+  # Keycloak environment: SCONE_CAS_ADDR, SCONE_LAS_ADDR
+  # and SCONE_CONFIG_ID.
+  attestation:
+    enabled: true
+    lasUseHostIP: true
+    cas: {{cas.cas.cas_url}}
+    KeycloakConfigID: {{session}}/keycloak
+    PySaverConfigID: {{session}}/pypkcsandcas
+
+# Define any SCONE-related variables. 
+  env:
+    - name: SCONE_EDMM_MODE
+      value: {{kcSconeEdmm}}
+    - name: SCONE_MIN_HEAP
+      value: {{kcSconeMinHeap}}
+    - name: SCONE_HEAP
+      value: {{kcSconeHeap}}
+    - name: SCONE_STACK
+      value: {{kcSconeStack}}
+    - name: SCONE_MODE
+      value: auto
+
+# Application environment variables
+# ATTENTION: do NOT include SCONE related variable inside this block, to avoid overwriting
+application:
+  env:
+    - name: KEYCLOAK_HOME
+      value: /keycloak
+    - name: KC_BOOTSTRAP_ADMIN_USERNAME
+      value: scontain
+    - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+      value: scontain
+    - name: KC_DB_USERNAME
+      value: ciam
+    - name: KC_DB_PASSWORD
+      value: Scontain
+    - name: KC_DB_SCHEMA
+      value: keycloak
+    - name: KC_DB_URL
+      value: jdbc:mariadb://{{database_host}}/keycloak?user=ciam&password=Scontain
+    - name: KC_DB
+      value: mariadb
+    - name: PROXY_ADDRESS_FORWARDING
+      value: "true"
+    - name: KC_HTTPS_CERTIFICATE_FILE
+      value: /keycloak/cert.pem
+    - name: KC_HTTPS_CERTIFICATE_KEY_FILE
+      value: /keycloak/key.pem
+    - name: KC_HTTP_PORT
+      value: "{{httpPort}}"
+    - name: KC_HTTPS_PORT
+      value: "{{httpsPort}}"
+
+env:
+  ## suffix appended to the auxiliary session where pkcsandcas.py will save MariaDB client PKCS12 credentials
+  suffixPkcsSession: {{suffixPkcsSession}}
+
+persistence:
+  ## Volumes identification
+  pvc_identification: {{pvc_identification}}
+
+securityContext: {}
+
+service:
+  # we use a Headless Service to expose statefulsets.
+  type: ClusterIP
+  # type: NodePort
+  #+clusterip: 10.104.77.254
+  # If type=NodePort, you can define a custom NodePort.
+  # This port must be available on all nodes.
+  nodePort: {{httpsPort}}
+  nodePorthttp: {{httpPort}}
+
+# The *_host variables represent the hostnames seen by the cluster
+# The *_fqdn variables should be the same as the CN used to generate the server TLS/x509 certificate
+database_host: {{database_host}}
+database_port: {{database_port}}
+keycloak_host: {{keycloak_host}}
+keycloak_fqdn: {{keycloak_fqdn}}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  #annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  #name:
+
+useSGXDevPlugin: {{useSGXDevPlugin}}
+sgxEpcMem: {{sgxEpcMem}}

@@ -1,0 +1,26 @@
+######################################################
+# Policies used to save databse PKCS client credentials
+# POLNAME: is policy name
+# SECRETSTORE: secret name referred by the seved/main session
+# KEYBIN: hexadecimal binary format of PKCS12
+# EXPSESS: exported to served/main session
+name: POLNAME
+version: "0.3.10" 
+
+access_policy:
+  read:
+    - CREATOR
+  update:
+    - CREATOR
+
+security:
+  attestation:
+    tolerate: [debug-mode, hyperthreading, outdated-tcb, insecure-configuration, software-hardening-needed]
+    ignore_advisories: "*"
+
+secrets:
+  - name: SECRETSTORE
+    kind: binary
+    value: KEYBIN
+    export:
+    - session: EXPSESS

@@ -1,0 +1,12 @@
+apiVersion: v2
+appVersion: 10.4.12
+description: Deploy Keycloak SCONE to Kubernetes
+home: https://scontain.com/
+icon: https://scontain.com/img/logo-vector-black-text.svg
+maintainers:
+- email: info@scontain.com
+  name: SCONE TEAM
+name: keycloak-scone
+type: application
+version: 0.1.0
+icon: https://scontain.com/img/logo-vector-black-text.svg

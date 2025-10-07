@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "keycloak-scone.fullname" . }}
+  labels:
+    {{- include "keycloak-scone.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if (eq .Values.service.type "ClusterIP") }}
+  clusterIP: None
+  {{- end }}
+  ports:
+    - port: {{ .Values.service.nodePorthttp }}
+      targetPort: kchttp
+      {{- if (and (eq .Values.service.type "NodePort") .Values.service.nodePorthttp) }}
+      nodePort: {{ .Values.service.nodePorthttp }}
+      {{- end }}
+      protocol: TCP
+      name: kchttp
+    - port: {{ .Values.service.nodePort }}
+      targetPort: kchttps
+      {{- if (and (eq .Values.service.type "NodePort") .Values.service.nodePort) }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}
+      protocol: TCP
+      name: kchttps
+  selector:
+    {{- include "keycloak-scone.selectorLabels" . | nindent 4 }}
