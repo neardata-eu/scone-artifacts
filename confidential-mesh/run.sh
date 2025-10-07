@@ -8,6 +8,8 @@ export BLUE='\e[34m'
 export ORANGE='\e[33m'
 export NC='\e[0m' # No Color
 
+###
+# comment these lines if you want colored log output
 export RED=''
 export BLUE=''
 export ORANGE=''
@@ -65,16 +67,9 @@ export PVC_IDENTIFICATION=${PVC_IDENTIFICATION:="$(get_value PVC_IDENTIFICATION 
 
 ###
 # setting ./run.sh parameters flags and other global variables
-# TODO: remove deprecate keys
 help_flag="--help"
 ns_flag="--namespace"
-ns_short_flag="-n"
-repo_flag="--image_repo"
-repo_short_flag="-i"
 verbose_flag="-v"
-verbose=""
-release_flag="--release"
-release_short_flag="-r"
 verbose=""
 debug_flag="--debug"
 debug_short_flag="-d"
@@ -103,7 +98,6 @@ usage ()
 {
   echo ""
   echo "Usage:"
-  echo "DEL run.sh [$ns_flag <kubernetes-namespace>] [$repo_flag <image repo>] [$release_flag <release name>] [$verbose_flag] [$help_flag]"
   echo "    run.sh [$clean_flag] $cas_location <[ public | private | operator ]> [$verbose_flag] [$help_flag]"
   echo ""
   echo ""
@@ -116,16 +110,6 @@ usage ()
   echo "                  A backup is kept in bkp_target/ directory"
   echo "    $cas_location   | cas location"
   echo "                  Can be 'public' or 'private'; details configured in file \"$f_MESH\""
-  echo "DEL $ns_short_flag | $ns_flag"
-  echo "DEL               The Kubernetes namespace in which the application should be deployed on the cluster."
-  echo "DEL               Default value: \"$DEFAULT_NAMESPACE\""
-  echo "DEL $release_flag | $release_short_flag"
-  echo "DEL               The helm release name of the application. "
-  echo "DEL               Default value defined in file 'release.sh': RELEASE=\"$RELEASE\""
-  echo "DEL $repo_short_flag | $repo_flag"
-  echo "DEL               Container image repository to use for pushing the generated confidential image"
-  echo "DEL               Default value is defined by environment variable:"
-  echo "DEL                 export APP_IMAGE_REPO=\"$APP_IMAGE_REPO\""
   echo "    $verbose_flag"
   echo "                  Enable verbose output"
   echo "    $debug_flag | $debug_short_flag"
@@ -143,33 +127,6 @@ usage ()
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
-# DEL    ${ns_flag} | ${ns_short_flag})
-# DEL      ns="$2"
-# DEL      if [ ! -n "${ns}" ]; then
-# DEL        usage
-# DEL        error_exit "Error: The namespace '$ns' is invalid."
-# DEL      fi
-# DEL      shift # past argument
-# DEL      shift || true # past value
-# DEL      ;;
-# DEL    ${repo_flag} | ${repo_short_flag})
-# DEL      repo="$2"
-# DEL      if [ ! -n "${repo}" ]; then
-# DEL        usage
-# DEL        error_exit "Error: The repo name '$repo' is invalid."
-# DEL      fi
-# DEL      shift # past argument
-# DEL      shift || true # past value
-# DEL      ;;
-# DEL    ${release_flag} | ${release_short_flag})
-# DEL      release="$2"
-# DEL      if [ ! -n "${release}" ]; then
-# DEL        usage
-# DEL        error_exit "Error: The release name '$release' is invalid."
-# DEL      fi
-# DEL      shift # past argument
-# DEL      shift || true # past value
-# DEL      ;;
     ${verbose_flag})
       verbose="-vvvvvvvv"
       shift # past argument
@@ -257,7 +214,6 @@ if [  "${repo}" == "" ]; then
     error_exit  "Error: You must specify a repository in configuration file '$f_MESH' using 'PUSH_IMAGE_REPO' key."
 fi
 export APP_IMAGE_REPO="${repo}"
-# DEL export RELEASE="$release"
 
 sudo echo "..:INF:check sudo before continuing" || error_exit  "..:ERR: failed to run 'sudo'."
 
@@ -294,7 +250,6 @@ if [ $clean -eq 1 ]; then
     fi
 fi
 
-# DEL echo "Current APP_NAMESPACE is:$APP_NAMESPACE"
 if [ -z "$APP_NAMESPACE" ] ; then
     # stores new session name referred by APP_NAMESPACE to later retrival from release.sh
     export APP_NAMESPACE="$RELEASE-$RANDOM-$RANDOM"
@@ -318,10 +273,6 @@ if [ $check_cas -eq 1 ]; then
     done
 fi
 
-## mig. WA for CAS inside Kubernetes, but not controlled by Operator
-#while [ "$cas_source" == "operator" ]; do
-#    echo mig. WA for CAS inside Kubernetes, but not controlled by Operator
-#    break
 if [ "$cas_source" == "operator" ]; then
     source <(kubectl provision cas "$CAS" -n "${CAS_NAMESPACE:-default}" --print-public-keys || exit 1)
     echo "..:DBG:kubectl provision cas $CAS -n ${CAS_NAMESPACE:-default} --print-public-keys"
@@ -329,11 +280,8 @@ if [ "$cas_source" == "operator" ]; then
     test $cas_key == $CAS_KEY && true || echo "..:WRN:CAS_KEY is different from the provided in configuration. Resetting to the freshest from CAS. old:$cas_key, new:$CAS_KEY" && cas_key="$CAS_KEY"
     test $cas_session_encryption_key == $CAS_SESSION_ENCRYPTION_KEY && true || echo "..:WRN:CAS_SESSION_ENCRYPTION_KEY is different from the provided in configuration. Resetting to the freshest from CAS. old:$cas_session_encryption_key new:$CAS_SESSION_ENCRYPTION_KEY" && cas_session_encryption_key="$CAS_SESSION_ENCRYPTION_KEY"
 fi
-#done
 
 if [ "$cas_source" == "private" ]; then
-    ## mig. WA for CAS inside Kubernetes, but not controlled by Operator
-    ## BEGIN
     set -x
     nohup kubectl port-forward service/$CAS 8081:8081 --namespace "${CAS_NAMESPACE}" --address=0.0.0.0 &
     sleep 5
@@ -348,7 +296,6 @@ if [ "$cas_source" == "private" ]; then
     export CAS_CERT="$(echo "$REPORT" | jq  ."additional_data"."non_critical"."cert_chain" |tr -d '"' |tr -d ^$)"
     set +x
 fi
-    ## END
 
 
 ###
@@ -496,14 +443,10 @@ echo -e "  - update the namespace '${ORANGE}policy.namespace${NC}' to a unique n
 envsubst < persistentVolumeClaimsMesh.yaml.template > persistentVolumeClaimsMesh.yaml
 kubectl apply -f persistentVolumeClaimsMesh.yaml
 
-#set -x
 export RND=$RANDOM
 SCONE="\$SCONE" envsubst < mesh.yaml.template > mesh.yaml
 
-#sconectl apply --cas-config $HOME/.cas -f mesh.yaml --release "$RELEASE" $verbose $debug
 sconectl apply --cas-config $HOME/.cas -f mesh.yaml --set-version "$VERSION" --release "$RELEASE" $verbose $debug
-
-echo "..:DBG:directories in target after sconectl apply mesh"
 
 echo -e "${BLUE}Executing a 'dry-run' simulated installation to verify for errors before proceding${NC}"
 
@@ -511,15 +454,10 @@ echo -e "${BLUE}Executing a 'dry-run' simulated installation to verify for error
 # * test the validity of the manifests produced before unistalling current configuration
 helm upgrade --dry-run --install $namespace_arg ${release} target/helm/ >/dev/null || false
 
-echo "${RED}..:DBG:halting here to change command to sleep infinity in keycloak container${NC}"
-echo "${RED}..:DBG:run these later${NC}"
-echo "${RED}...... helm install $namespace_arg ${release} target/helm/ || \ ${NC}"
-echo "${RED}...... helm upgrade $namespace_arg --install ${release} target/helm/ ${NC}"
-
 echo -e "${BLUE}Uninstalling application in case it was previously installed:${NC} helm uninstall ${namespace_arg} ${RELEASE}"
 echo -e "${BLUE} - this requires that 'kubectl' gives access to a Kubernetes cluster${NC}"
 
-# helm uninstall $namespace_arg ${release} 2> /dev/null || true
+helm uninstall $namespace_arg ${release} 2> /dev/null || true
 
 echo -e "${BLUE}install application:${NC} helm install ${namespace_arg} ${RELEASE} target/helm/"
 
@@ -535,7 +473,7 @@ sleep 1
 python3 getcas.py 127.0.0.1 $APP_NAMESPACE/secrets Keycloak_CA_Cert
 kill `ps -ef |grep port-forward.*8081 |grep -v grep |awk '{print $2}'`
 
-echo MINE
+echo FINISHED
 echo -e "${BLUE}Check the logs by executing:${NC} kubectl logs ${namespace_arg}"
 echo -e "${BLUE}Uninstall by executing:${NC} helm uninstall ${RELEASE}"
 
