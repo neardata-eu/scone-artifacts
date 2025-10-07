@@ -52,9 +52,9 @@ application:
   env:
     - name: KEYCLOAK_HOME
       value: /keycloak
-    - name: KC_BOOTSTRAP_ADMIN_USERNAME
+    - name: KEYCLOAK_ADMIN
       value: scontain
-    - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+    - name: KEYCLOAK_ADMIN_PASSWORD
       value: scontain
     - name: KC_DB_USERNAME
       value: ciam
@@ -78,11 +78,10 @@ application:
       value: "{{httpsPort}}"
 
 env:
-  ## suffix appended to the auxiliary session where pkcsandcas.py will save MariaDB client PKCS12 credentials
   suffixPkcsSession: {{suffixPkcsSession}}
 
 persistence:
-  ## Volumes identification
+  ## Volume identification
   pvc_identification: {{pvc_identification}}
 
 securityContext: {}

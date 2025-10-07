@@ -25,4 +25,4 @@ spec:
       protocol: TCP
       name: kchttps
   selector:
-    {{- include "keycloak-scone.selectorLabels" . | nindent 4 }}
+    {{- include "mariadb-scone.selectorLabels" . | nindent 4 }}

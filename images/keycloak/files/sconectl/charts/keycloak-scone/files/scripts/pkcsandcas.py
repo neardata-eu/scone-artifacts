@@ -68,21 +68,26 @@ def fail_message_exit(message: str, payload: any):
 ###
 # Global variables
 
-PKCSPWD=validate_envvar("PKCSPWD")
-PKCSALIAS=validate_envvar("PKCSALIAS")
-PKCSCACRT=validate_envvar("PKCSCACRT")
-PKCSCERT=validate_envvar("PKCSCERT")
-PKCSCERTPRIV=validate_envvar("PKCSCERTPRIV")
-CASCLICERT=validate_envvar("CASCLICERT")
-CASCLIKEY=validate_envvar("CASCLIKEY")
-POLTMPL=validate_envvar("POLTMPL")
-SECRETSTORE=validate_envvar("SECRETSTORE")
+# PKCS=validate_envvar("PKCS") #os.environ.get("PKCS", "/ChangeThisNameDynamically.pkcs12")
+PKCSPWD=validate_envvar("PKCSPWD") #os.environ.get("PKCSPWD", "TUDciamSCONE")
+PKCSALIAS=validate_envvar("PKCSALIAS") #os.environ.get("PKCSALIAS", "MARIADB_CLIENT_CERT")
+PKCSCACRT=validate_envvar("PKCSCACRT") #os.environ.get("PKCSCACRT", "/tls/i_mariadb-ca.crt")
+PKCSCERT=validate_envvar("PKCSCERT") #os.environ.get("PKCSCERT", "/tls/i_mariadb-client.crt")
+PKCSCERTPRIV=validate_envvar("PKCSCERTPRIV") #os.environ.get("PKCSCERTPRIV", "/tls/i_mariadb-client.key")
+CASCLICERT=validate_envvar("CASCLICERT") #os.environ.get("CASCLICERT", "/python/cert.pem")
+CASCLIKEY=validate_envvar("CASCLIKEY") #os.environ.get("CASCLIKEY", "/python/key.pem")
+# CASCLICERTSUBJ=validate_envvar("CASCLICERTSUBJ") #os.environ.get("CASCLICERTSUBJ", "/C=DE/ST=SA/L=Dresden/O=Scontain/OU=Sconectl/CN=ciam")
+POLTMPL=validate_envvar("POLTMPL") #os.environ.get("POLTMPL", "/python/pol.template.yaml")
+# POLHASHES=validate_envvar("POLHASHES") #os.environ.get("POLHASHES", "/python/hashespkcs.list")
+# POLREG=validate_envvar("POLREG") #os.environ.get("POLREG", "/polpkcs.yaml")
+SECRETSTORE=validate_envvar("SECRETSTORE") #os.environ.get("SECRETSTORE", "MariadbPkcs12")
 
-CAS_URL=validate_envvar("CAS_URL")
-CAS_SESSION=validate_envvar("CAS_SESSION")
-SFX_PKCS_SESSION=validate_envvar("SFX_PKCS_SESSION")
+CAS_URL=validate_envvar("CAS_URL") #""
+CAS_SESSION=validate_envvar("CAS_SESSION") #""
+SFX_PKCS_SESSION=validate_envvar("SFX_PKCS_SESSION") #""
 EXPSESS=CAS_SESSION.split('/')[0]+'/'+CAS_SESSION.split('/')[1]
 KEYBIN=""
+# memPOLREG=io.StringIO("")
 memPOLREG=io.BytesIO(None)
 
 POLNAME=CAS_SESSION[0:CAS_SESSION.find("/")]+"-"+SFX_PKCS_SESSION

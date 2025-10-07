@@ -1,4 +1,4 @@
-name: {{namespace}}/{{sconeKeycloakImageUnderline}}
+name: {{namespace}}/{{sconeKeycloakImageUnderline}}_debug
 version: 0.3.10
 predecessor: {{predecessor}}
 
@@ -15,7 +15,7 @@ creator:
 secrets:
  - name: image_latest
    kind: ascii
-   value: {{sconeKeycloakImage}}
+   value: {{sconeKeycloakImage}}_debug_latest
    export_public: true
 
  - name: image_stable
@@ -39,8 +39,16 @@ secrets:
    kind: config-fragment
    export_public: true
    value:
+     # - signer:
+     #     mrsigner: 38cb7c34050a1878bf05c5e6b4031d4276abff7f84770b8d8bd35d6904361966
+     #       # - 11c4e150b76c2b145f7fadb6c30455e1046b9e6fbb75b49c6e13341ad8acc5bd
+     #       # - 38cb7c34050a1878bf05c5e6b4031d4276abff7f84770b8d8bd35d6904361966
+     #     isvprodid: 0
+     #     isvsvn_min: 0
      - signer:
          mrsigner: 11c4e150b76c2b145f7fadb6c30455e1046b9e6fbb75b49c6e13341ad8acc5bd
+           # - 11c4e150b76c2b145f7fadb6c30455e1046b9e6fbb75b49c6e13341ad8acc5bd
+           # - 38cb7c34050a1878bf05c5e6b4031d4276abff7f84770b8d8bd35d6904361966
          isvprodid: 0
          isvsvn_min: 0
 
@@ -50,12 +58,16 @@ secrets:
    value:
      - signer:
          mrsigner: 38cb7c34050a1878bf05c5e6b4031d4276abff7f84770b8d8bd35d6904361966
+           # - 11c4e150b76c2b145f7fadb6c30455e1046b9e6fbb75b49c6e13341ad8acc5bd
+           # - 38cb7c34050a1878bf05c5e6b4031d4276abff7f84770b8d8bd35d6904361966
          isvprodid: 0
          isvsvn_min: 0
        mrenclave:
          - {{sconeHashJavaKeycloak}}
      - signer:
          mrsigner: 11c4e150b76c2b145f7fadb6c30455e1046b9e6fbb75b49c6e13341ad8acc5bd
+           # - 11c4e150b76c2b145f7fadb6c30455e1046b9e6fbb75b49c6e13341ad8acc5bd
+           # - 38cb7c34050a1878bf05c5e6b4031d4276abff7f84770b8d8bd35d6904361966
          isvprodid: 0
          isvsvn_min: 0
        mrenclave:
@@ -68,12 +80,16 @@ secrets:
    value:
      - signer:
          mrsigner: 38cb7c34050a1878bf05c5e6b4031d4276abff7f84770b8d8bd35d6904361966
+           # - 11c4e150b76c2b145f7fadb6c30455e1046b9e6fbb75b49c6e13341ad8acc5bd
+           # - 38cb7c34050a1878bf05c5e6b4031d4276abff7f84770b8d8bd35d6904361966
          isvprodid: 0
          isvsvn_min: 0
        mrenclave:
          - {{sconeHashJavaKeycloak}}
      - signer:
          mrsigner: 11c4e150b76c2b145f7fadb6c30455e1046b9e6fbb75b49c6e13341ad8acc5bd
+           # - 11c4e150b76c2b145f7fadb6c30455e1046b9e6fbb75b49c6e13341ad8acc5bd
+           # - 38cb7c34050a1878bf05c5e6b4031d4276abff7f84770b8d8bd35d6904361966
          isvprodid: 0
          isvsvn_min: 0
        mrenclave:

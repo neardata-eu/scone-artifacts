@@ -39,7 +39,7 @@ spec:
           imagePullPolicy: Always
           command:
             - python3
-            - /python/pkcsandcas.py
+            - /production/bin/pkcsandcas.py
           env:
             {{- if .Values.scone.attestation.enabled }}
             - name: SCONE_CONFIG_ID
@@ -53,6 +53,9 @@ spec:
             {{- end }}
             - name: SCONE_HEAP
               value: 1G
+            # mig 26feb2025 test absence of dl open in Python PKCS generator
+            #- name: SCONE_ALLOW_DLOPEN
+            #  value: "2"
             - name: SCONE_MODE
               value: auto
             - name: SCONE_SYSLIBS
