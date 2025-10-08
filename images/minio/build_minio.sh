@@ -34,7 +34,7 @@ echo "
 ..:INF: you can inject credentials and other environment variables via attestation
 .. for example:
 MINIO_ROOT_USER=minioroot
-MINIO_ROOT_PASSWORD=sc0n35EC4e7
+MINIO_ROOT_PASSWORD=.........
 
 .. the other MINIO_* environment variables are default to the system (as seen from the official image minio/minio:latest) and embedded in this base image.
 .. however, they should be injected via attestation as well:

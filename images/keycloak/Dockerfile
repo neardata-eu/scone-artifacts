@@ -29,9 +29,9 @@ WORKDIR /keycloak
 # ........ For more information to setup and run the mesh of services, check documentation docs/DEPLOY_MESH.md
 ENV KEYCLOAK_HOME="/keycloak"
 ENV KC_BOOTSTRAP_ADMIN_USERNAME="neardatachange"
-ENV KC_BOOTSTRAP_ADMIN_PASSWORD="Ch4n63Pa55w0rd"
+ENV KC_BOOTSTRAP_ADMIN_PASSWORD="........."
 ENV KC_DB_SCHEMA=keycloak
-ENV KC_DB_URL='jdbc:mariadb://mariadb/keycloak?user=kcadmin&password=1qaz2wsx3EDC'
+ENV KC_DB_URL='jdbc:mariadb://mariadb/keycloak?user=kcadmin&password=.........'
 ENV KC_DB=mariadb
 ENV KC_HTTPS_CERTIFICATE_FILE=/keycloak/cert.pem
 ENV KC_HTTPS_CERTIFICATE_KEY_FILE=/keycloak/key.pem

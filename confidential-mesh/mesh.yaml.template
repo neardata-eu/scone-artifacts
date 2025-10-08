@@ -216,8 +216,7 @@ env:
       - name: sconeKeycloakImageUnderline
         value: $KEYCLOAK_IMAGE_UNDERLINE
       - name: databaseConnectUrl
-        #value: jdbc:mariadb://${MARIADB_CONTAINER_NAME}/keycloak?user=ciam&password=TUDciamSCONE&sslMode=trust&keyStore=/tls/mariadb.pkcs12&keyStorePassword=TUDciamSCONE
-        value: jdbc:mariadb://${MARIADB_CONTAINER_NAME}/keycloak?user=ciam&password=TUDciamSCONE&sslMode=trust&keyStore=/tls/mariadb.pkcs12&keyStorePassword=$$SCONE::MariadbPkcs12Password$$
+        value: jdbc:mariadb://${MARIADB_CONTAINER_NAME}/keycloak?user=ciam&password=.........&sslMode=trust&keyStore=/tls/mariadb.pkcs12&keyStorePassword=$$SCONE::MariadbPkcs12Password$$
       - name: pathJavaKc
         value: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/jvm/java-$JAVA_VERSION-openjdk/jre/bin:/usr/lib/jvm/java-$JAVA_VERSION-openjdk/bin:/keycloak/bin"
       - name: ldLibraryPathJavaKc

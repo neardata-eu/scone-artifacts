@@ -63,7 +63,7 @@ application:
     - name: KC_DB_SCHEMA
       value: keycloak
     - name: KC_DB_URL
-      value: jdbc:mariadb://{{database_host}}/keycloak?user=ciam&password=Scontain
+      value: jdbc:mariadb://{{database_host}}/keycloak?user=ciam&password=.........
     - name: KC_DB
       value: mariadb
     - name: PROXY_ADDRESS_FORWARDING
