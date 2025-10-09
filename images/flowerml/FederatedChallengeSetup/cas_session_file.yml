@@ -1,0 +1,102 @@
+name: NEARDATA_DEMO_46-16503 
+version: "0.3.9"
+
+security:
+  attestation:
+    mode: none
+    tolerate: [debug-mode, hyperthreading, outdated-tcb, software-hardening-needed]
+    ignore_advisories: "*"
+
+
+services:
+  - name: python_server 
+    mrenclaves: [825b4b54233d060a408edda8ac761f1efa4b504a30b89d02b83ab7fb07baeb88]
+    command: /opt/conda/bin/python @@1 
+    environment:
+      LD_LIBRARY_PATH: "/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu"
+      SCONE_MODE: HW
+      SCONE_HEAP: 6G
+      SCONE_SYSLIBS: 1 
+      SCONE_SYNC_FSPF_TAG_WITH_CAS: 1
+      SCONE_VERSION: 1 
+      SCONE_FORK: 1
+      SCONE_NETWORK_SHIELD: protected
+      SCONE_NETWORK_SHIELD_SERVER_1: protected
+      SCONE_NETWORK_SHIELD_SERVER_1_PORT: TCP:8080
+      SCONE_NETWORK_SHIELD_SERVER_1_CLIENT_AUTH: $$SCONE::ca_certificate$$
+      SCONE_NETWORK_SHIELD_SERVER_1_IDENTITY: $$SCONE::server_certificate:privatekey:pkcs8:pem$$$$SCONE::server_certificate:crt:pem$$
+      SCONE_NETWORK_SHIELD_UNSUPPORTED_PROTOCOLS: unprotected
+    pwd: /app/code
+
+  - name: python_client
+    mrenclaves: [825b4b54233d060a408edda8ac761f1efa4b504a30b89d02b83ab7fb07baeb88]
+    command: /opt/conda/bin/python @@1
+    environment:
+      LD_LIBRARY_PATH: "/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu"
+      SCONE_MODE: HW
+      SCONE_HEAP: 6G
+      SCONE_SYSLIBS: 1
+      SCONE_VERSION: 1
+      SCONE_FORK: 1
+      SCONE_SYNC_FSPF_TAG_WITH_CAS: 1
+      SCONE_NETWORK_SHIELD: protected
+      SCONE_NETWORK_SHIELD_CLIENT_1: protected
+      SCONE_NETWORK_SHIELD_CLIENT_1_DESTINATION: TCP:localhost:8080
+      SCONE_NETWORK_SHIELD_CLIENT_1_DESTINATION_IP: 127.0.0.1
+      SCONE_NETWORK_SHIELD_CLIENT_1_SERVER_AUTH: $$SCONE::ca_certificate$$
+      SCONE_NETWORK_SHIELD_CLIENT_1_IDENTITY: $$SCONE::client_certificate:privatekey:pkcs8:pem$$$$SCONE::client_certificate:crt:pem$$
+      SCONE_NETWORK_SHIELD_UNSUPPORTED_PROTOCOLS: unprotected
+    pwd: /app/code
+    image_name: prep_image
+
+  - name: python_data_prep 
+    mrenclaves: [825b4b54233d060a408edda8ac761f1efa4b504a30b89d02b83ab7fb07baeb88]
+    command: /opt/conda/bin/python @@1 
+    environment:
+      LD_LIBRARY_PATH: "/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu"
+      SCONE_MODE: HW
+      SCONE_HEAP: 6G
+      SCONE_SYSLIBS: 1 
+      SCONE_VERSION: 1 
+      SCONE_SYNC_FSPF_TAG_WITH_CAS: 1
+      SCONE_FORK: 1
+    image_name: prep_image
+    pwd: /app/code
+
+
+volumes:
+  - name: my_database1
+
+images:
+  - name: prep_image
+    volumes:
+      - name: my_database1
+        path: /app/input
+
+
+secrets:
+  - name: ca_private_key
+    kind: private-key
+  - name: ca_certificate
+    kind: x509-ca
+    private_key: ca_private_key
+    common_name: Flower_CA
+
+  - name: server_private_key
+    kind: private-key
+  - name: server_certificate
+    kind: x509
+    private_key: server_private_key
+    issuer: ca_certificate
+    common_name: flower_demo_server
+    endpoint: server
+    dns: localhost
+
+  - name: client_private_key
+    kind: private-key
+  - name: client_certificate
+    kind: x509
+    private_key: client_private_key
+    issuer: ca_certificate
+    common_name: flower_demo_client
+    endpoint: client

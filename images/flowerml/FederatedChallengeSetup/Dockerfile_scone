@@ -1,0 +1,22 @@
+FROM fl_challenge:team_name
+
+COPY --from=registry.scontain.com/sconecuratedimages/runtime:scone-deb-pkgs /scone* /packages/
+
+RUN DEBIAN_FRONTEND="noninteractive" apt update && \
+   apt install -y python3 python3-psutil openssh-client gettext-base binutils patchelf curl && \
+   rm -rf /var/lib/apt/lists/* && \
+   dpkg -i /packages/*.deb && \
+   mkdir -p /opt/scone/packages && \
+   cp /packages/*.deb /opt/scone/packages && \
+   rm -rf /packages /tmp/* && chmod 1777 /tmp && \
+   apt-mark hold libc6 # make sure we don't overwrite our libc with some other version
+    
+ENV SCONE_ALLOW_DLOPEN=2 SCONE_VERSION=1 SCONE_MODE=HW
+
+ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu SCONE_HEAP=6G SCONE_SYSLIBS=1 SCONE_FORK=1 SCONE_MPROTECT=0
+
+RUN ls -l `realpath /opt/conda/bin/python3`
+RUN scone-signer sign --sconify --env /opt/conda/bin/python3
+RUN ls -l `realpath /opt/conda/bin/python3`
+RUN SCONE_HASH=1 /opt/conda/bin/python3
+RUN rm -rf /opt/scone/bin

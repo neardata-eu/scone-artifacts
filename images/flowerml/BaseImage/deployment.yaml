@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: challenge-docker-deployment
+  labels:
+    app: challenge-docker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: challenge-docker
+  template:
+    metadata:
+      labels:
+        app: challenge-docker
+    spec:
+      volumes:
+        - name: data
+          hostPath:
+            path: /mnt/ceph/tco/TCO-Staff/Homes/kirchnema/04_pycharm/04_Docker_Challenge/challenge-docker/ChallengeSetup
+            type: Directory
+      containers:
+          - name: challenge-docker
+            image: registry.gitlab.com/nct_tso_public/challenge-docker:latest
+            imagePullPolicy: IfNotPresent
+            volumeMounts:
+              - mountPath:  /mnt/ceph/tco/TCO-Staff/Homes/kirchnema/04_pycharm/04_Docker_Challenge/challenge-docker/ChallengeSetup
+                name: data
+                readOnly: true
+

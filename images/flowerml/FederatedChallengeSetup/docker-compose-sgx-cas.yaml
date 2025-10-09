@@ -1,0 +1,91 @@
+version: '3.7'
+
+services:
+
+  las:
+    image: registry.scontain.com:5050/scone.cloud/las
+    devices:
+      - /dev/sgx_enclave
+      - /dev/sgx_provision
+    restart: on-failure
+    network_mode: "host"
+        
+
+  server:
+    image: fl_challenge:team_name_sgx
+    build:
+      context: .
+      dockerfile: Dockerfile_scone
+    network_mode: "host"
+    devices:
+      - /dev/sgx_enclave
+    depends_on: [ las ]
+    environment:
+      - SCONE_ALLOW_DLOPEN=2
+      - SCONE_HEAP=6G
+      - SCONE_MODE=HW
+      - SCONE_SYSLIBS=1
+      - SCONE_VERSION=1
+      - SCONE_FORK=1
+      - FLWR_TELEMETRY_ENABLED=0
+      - SESSION_IDEN=NEARDATA_DEMO_46-16503
+    volumes:
+      - ./src/server:/app/code:rw
+      - ./data/output/:/app/output
+    command:
+      - /app/code/run_python_with_cas.sh
+
+
+  client1:
+    image: fl_challenge:team_name_sgx
+    build:
+      context: .
+      dockerfile: Dockerfile_scone
+    environment:
+      - gpus=all
+      - SCONE_ALLOW_DLOPEN=2
+      - SCONE_HEAP=6G
+      - SCONE_MODE=HW
+      - SCONE_SYSLIBS=1
+      - SCONE_VERSION=1
+      - SCONE_FORK=1
+      - CLIENT_NR=1
+      - FLWR_TELEMETRY_ENABLED=0
+      - SESSION_IDEN=NEARDATA_DEMO_46-16503
+    devices:
+      - /dev/sgx_enclave
+    depends_on: [ server ]
+    network_mode: "host"
+    volumes:
+      - ./src/client:/app/code:rw
+      - ./data/input:/app/input
+      - ./data/output:/app/output
+    command:
+      - /app/code/run_python_with_cas.sh
+
+  client2:
+    image: fl_challenge:team_name_sgx
+    build:
+      context: .
+      dockerfile: Dockerfile_scone
+    depends_on: [ server ]
+    network_mode: "host"
+    devices:
+      - /dev/sgx_enclave
+    volumes:
+      - ./src/client:/app/code:rw
+      - ./data/input:/app/input
+      - ./data/output:/app/output
+    environment:
+      - SCONE_ALLOW_DLOPEN=2
+      - SCONE_MODE=HW
+      - SCONE_HEAP=6G
+      - SCONE_SYSLIBS=1
+      - SCONE_VERSION=1
+      - SCONE_FORK=1
+      - CLIENT_NR=2
+      - FLWR_TELEMETRY_ENABLED=0
+      - SESSION_IDEN=NEARDATA_DEMO_46-16503
+    command:
+      - /app/code/run_python_with_cas.sh
+

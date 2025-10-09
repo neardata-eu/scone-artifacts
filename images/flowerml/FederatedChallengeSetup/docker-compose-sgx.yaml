@@ -1,0 +1,98 @@
+version: '3.7'
+
+networks:
+  challenge_net:
+    internal: false
+
+services:
+
+  server:
+    image: fl_challenge:team_name_sgx
+    build:
+      context: .
+      dockerfile: Dockerfile_scone
+    networks:
+      challenge_net:
+        aliases:
+          - server
+    devices:
+      - /dev/sgx_enclave
+    environment:
+      - SCONE_ALLOW_DLOPEN=2
+      - SCONE_HEAP=6G
+      - SCONE_MODE=HW
+      - SCONE_SYSLIBS=1
+      - SCONE_VERSION=1
+      - SCONE_LOG=ERROR
+      - SCONE_FORK=1
+      - FLWR_TELEMETRY_ENABLED=0
+    volumes:
+      - ./src/server:/app/code:rw
+      - ./data/output:/app/output
+
+
+  client1:
+    image: fl_challenge:team_name_sgx
+    build:
+      context: .
+      dockerfile: Dockerfile_scone
+    environment:
+      - gpus=all
+      - SCONE_ALLOW_DLOPEN=2
+      - SCONE_HEAP=6G
+      - SCONE_MODE=HW
+      - SCONE_SYSLIBS=1
+      - SCONE_VERSION=1
+      - SCONE_LOG=ERROR
+      - SCONE_FORK=1
+      - FLWR_TELEMETRY_ENABLED=0
+      - CLIENT_NR=1
+    devices:
+      - /dev/sgx_enclave
+    depends_on: [ server ]
+    networks:
+      - challenge_net
+    volumes:
+      - ./src/client:/app/code:rw
+      - ./data/input:/app/input
+      - ./data/output:/app/output
+
+  client2:
+    image: fl_challenge:team_name_sgx
+    build:
+      context: .
+      dockerfile: Dockerfile_scone
+    depends_on: [ server ]
+    networks:
+      - challenge_net
+    devices:
+      - /dev/sgx_enclave
+    volumes:
+      - ./src/client:/app/code:rw
+      - ./data/input:/app/input
+      - ./data/output:/app/output
+    environment:
+      - SCONE_ALLOW_DLOPEN=2
+      - SCONE_MODE=HW
+      - SCONE_HEAP=6G
+      - SCONE_SYSLIBS=1
+      - SCONE_VERSION=1
+      - SCONE_LOG=ERROR
+      - SCONE_FORK=1
+      - FLWR_TELEMETRY_ENABLED=0
+      - CLIENT_NR=1
+  hacker:
+    image: "fl_challenge:team_name"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on: [ server ]
+    environment:
+      - FLWR_TELEMETRY_ENABLED=0
+    networks:
+      - challenge_net
+    volumes:
+      - ./src/hacker:/app/code:rw
+      - ./data/input:/app/input:ro
+      - ./data/output:/app/output
+ 
