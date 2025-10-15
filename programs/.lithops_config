@@ -1,0 +1,17 @@
+lithops:
+    backend : singularity
+    storage: minio
+    execution_timeout: 120
+    log_level: debug
+localhost:
+    runtime: python3
+rabbitmq: 
+    amqp_url: amqp://%RMQ_USER%:%RMQ_PASS%@%RMQ_SERVER%:%RMQ_PORT%/%RMQ_QUEUE%
+singularity:
+    worker_processes:    %LITHOPS_WORKERS%
+    runtime: singularity-metabolomics1.sif
+minio:
+    storage_bucket: %MINIO_BUCKET%
+    endpoint: http://%MINIO_SERVER%:%MINIO_PORT%
+    access_key_id: %MINIO_USER%
+    secret_access_key: %MINIO_PASS%

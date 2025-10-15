@@ -1,0 +1,31 @@
+{
+    "image_generation": {
+        "n_levels": 30,
+        "ppm": 3,
+        "min_px": 1,
+        "compute_unused_metrics": false
+    },
+    "analysis_version": 1,
+    "isotope_generation": {
+        "adducts": [
+            "+H",
+            "+Na",
+            "+K",
+            "[M]+"
+        ],
+        "charge": 1,
+        "isocalc_sigma": 0.000619,
+        "instrument": "FTICR",
+        "n_peaks": 4,
+        "neutral_losses": [],
+        "chem_mods": []
+    },
+    "fdr": {
+        "decoy_sample_size": 20,
+        "scoring_model_id": null
+    },
+    "database_ids": [
+        1
+    ],
+    "ontology_db_ids": []
+}

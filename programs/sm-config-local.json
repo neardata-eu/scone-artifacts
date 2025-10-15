@@ -1,0 +1,153 @@
+{
+	"db": {
+		"host": "localhost",
+		"database": "sm_test",
+		"user": "user",
+		"password": "password"
+	},
+	"lithops": {
+		"lithops": {
+			"mode": "localhost",
+			"storage": "localhost",
+			"include_modules": [
+				"sm"
+			],
+			"data_cleaner": true,
+			"data_limit": false,
+			"workers": 1000,
+			"execution_timeout": 7200,
+			"log_level": "DEBUG"
+		},
+		"serverless": {
+			"backend": "aws_lambda"
+		},
+		"standalone": {
+			"backend": "aws_ec2"
+		},
+		"localhost": {},
+		"aws": {
+			"access_key_id": "",
+			"secret_access_key": "",
+			"session_token": "",
+			"region": ""
+		},
+		"aws_lambda": {
+			"runtime_timeout": 900,
+			"runtime": "",
+			"execution_role": ""
+		},
+		"aws_ec2": {
+			"exec_mode": "consume",
+			"soft_dismantle_timeout": 500,
+			"hard_dismantle_timeout": 7200,
+			"runtime": "",
+			"ssh_key_filename": "",
+			"instance_id": "",
+			"ec2_instances": {
+				"aws_ec2_32": "",
+				"aws_ec2_64": "",
+				"aws_ec2_128": "",
+				"aws_ec2_256": ""
+			}
+		},
+		"sm_storage": {
+			"imzml": [
+				"sm-lithops-test",
+				"imzml"
+			],
+			"moldb": [
+				"sm-lithops-test",
+				"moldb"
+			],
+			"centroids": [
+				"sm-lithops-test",
+				"centroids"
+			],
+			"pipeline_cache": [
+				"sm-lithops-test",
+				"pipeline_cache"
+			]
+		}
+	},
+	"aws": {
+		"access_key_id": "",
+		"secret_access_key": "",
+		"session_token": "",
+		"aws_default_region": "",
+		"region": ""
+	},
+	"isotope_storage": {
+		"path": "sm-lithops-test"
+	},
+	"logs": {
+		"version": 1,
+		"formatters": {
+			"sm": {
+				"format": "%(asctime)s - %(levelname)s - %(name)s - %(filename)s:%(lineno)d - %(message)s"
+			}
+		},
+		"handlers": {
+			"console_warn": {
+				"class": "logging.StreamHandler",
+				"formatter": "sm",
+				"level": "WARNING"
+			},
+			"console_debug": {
+				"class": "logging.StreamHandler",
+				"formatter": "sm",
+				"level": "DEBUG"
+			},
+			"context_logger": {
+				"class": "sm.engine.utils.log_capture.ContextLogHandler",
+				"formatter": "sm",
+				"level": "INFO"
+			}
+		},
+		"root": {
+			"handlers": [
+				"console_debug",
+				"context_logger"
+			],
+			"level": "WARNING"
+		},
+		"loggers": {
+			"engine": {
+				"level": "INFO"
+			},
+			"api": {
+				"level": "INFO"
+			},
+			"update-daemon": {
+				"level": "INFO"
+			},
+			"annotate-daemon": {
+				"level": "INFO"
+			}
+		}
+	},
+	"ds_config_defaults": {
+		"adducts": {
+			"+": [
+				"+H",
+				"+Na",
+				"+K"
+			],
+			"-": [
+				"-H",
+				"+Cl"
+			]
+		}
+	},
+	"storage": {
+		"endpoint_url": "",
+		"access_key_id": "",
+		"secret_access_key": ""
+	},
+	"image_storage": {
+		"bucket": "sm-img-storage-test",
+		"raw_img_bucket": "sm-engine-tests"
+	},
+	"imzml_browser_storage": {
+		"bucket": "sm-imzml-browser-test"
+	}
+}
