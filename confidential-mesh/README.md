@@ -42,6 +42,7 @@ Refer to **[here](https://sconedocs.github.io/install_sconectl/ "Installing scon
 
 ### Core configuration file
 There are too many settings and they are placed in a **bash-like** configuration file called **`mesh.txt`**. The values are set in a **`key=value`** fashion.
+Check details of [**`mesh.txt`**](./MESH_TXT.md "MESH_TXT.md").
 
 SCONECTL will deploy into the cluster the services described in a file named `mesh.yaml`, that is built from [**`mesh.yaml.template`**](./mesh.yaml.template "mesh.yaml.template") using the configurations from [**`mesh.txt`**](./mesh.txt "mesh.txt").
 Some settings will compose the attestation policies.
